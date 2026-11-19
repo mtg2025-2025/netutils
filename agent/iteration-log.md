@@ -52,6 +52,13 @@ Format: **Date. What was tried.** What happened (evidence). What changed.
 - **Changed:** the run command now also mounts `../agent-history`, a host folder next to the repository, at `/root/.claude/projects`. Added `agent/tools/session_report.py`, which prints duration, prompts, API calls and tokens for each session. Tested with a one-prompt session, which recorded 1 prompt, 1 API call, 21,029 input tokens and 4 output tokens.
 - **Trade-off:** this deliberately widens what persists. The agent can write to one more host folder, and transcripts contain everything the agent read. The folder is kept outside the repository so transcripts are never committed.
 
+## 2026-11-18: End-of-exercise checkup
+
+- **Tried:** reviewed the problems that came up during Exercise 2: Notepad escaping Markdown, Notepad saving `Dockerfile` as `Dockerfile.txt` (and once emptying it), Windows line endings in shell scripts, and a personal Windows path in `setup.md`. Each was caught by hand, some only after the files had been submitted.
+- **Changed:** added `agent/tools/checkup.py`, a deterministic checkup to run at the end of every exercise. It checks for required and empty files, `.txt` misnames, Markdown damage, BOM and encoding problems, LF line endings for scripts, secrets and personal paths, transcripts kept out of the repo, whether everything is committed and pushed, and whether the iteration log is current. With `--docker` it also rebuilds both images, confirms egress is blocked and the API is reachable, and reruns the tests.
+- **Evidence it works:** on the current repo, 16 checks ran with 0 failures. With planted damage (escaped Markdown, an empty `Dockerfile.txt`, a fake `sk-ant-` key, a Windows user path and a BOM in a `.sh` file), it reported 4 failures covering all of them and exited with code 1.
+- **Capstone note:** this is a candidate for a CI guardrail (a GitHub Action that runs the checkup on every pull request).
+
 ## Open items
 
 - Run `python agent/tools/session_report.py` after every agent session and record the numbers here. They make up the baseline that the capstone compares against. Note the `$:` cost from the Claude Code status line before exiting, because the transcript records tokens but not cost.
