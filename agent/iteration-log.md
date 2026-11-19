@@ -45,8 +45,15 @@ Format: **Date. What was tried.** What happened (evidence). What changed.
 - **Interpretation:** the 4 DNS failures are expected inside the sandbox and show the network boundary holding. Reviewers and agents must treat them as known failures, without letting them hide a real failure in the same file.
 - **Proxy log** (`logs/2026-11-18-egress-proxy.log`): during the sessions, Claude Code also tried to reach `github.com`, `api.github.com`, `raw.githubusercontent.com`, `registry.npmjs.org`, `downloads.claude.ai` (its update check), `mcp-proxy.anthropic.com` and a Datadog telemetry endpoint. **The proxy refused all of them**, and the agent kept working. Only `api.anthropic.com` was allowed (43 connections).
 
+## 2026-11-18: Persist session history for metrics
+
+- **Tried:** after smoke test 2, tried to recover token and cost numbers for the two agent sessions.
+- **Evidence:** they were gone. Claude Code keeps session transcripts in `/root/.claude/projects` inside the container, and `--rm` deletes them on exit. Only the login (in the `claude-auth` volume) survived.
+- **Changed:** the run command now also mounts `../agent-history`, a host folder next to the repository, at `/root/.claude/projects`. Added `agent/tools/session_report.py`, which prints duration, prompts, API calls and tokens for each session. Tested with a one-prompt session, which recorded 1 prompt, 1 API call, 21,029 input tokens and 4 output tokens.
+- **Trade-off:** this deliberately widens what persists. The agent can write to one more host folder, and transcripts contain everything the agent read. The folder is kept outside the repository so transcripts are never committed.
+
 ## Open items
 
-- Record **time taken and cost** (from the Claude Code status line) for every agent run from now on. These numbers make up the baseline that the capstone compares against.
+- Run `python agent/tools/session_report.py` after every agent session and record the numbers here. They make up the baseline that the capstone compares against. Note the `$:` cost from the Claude Code status line before exiting, because the transcript records tokens but not cost.
 - Decide whether `downloads.claude.ai` should be allowed. Blocking it stops Claude Code from updating itself inside the container, which is arguably what we want, since the image should only change when it's rebuilt.
 - Two tests are skipped because `napalm` can't import `pkg_resources`. This is an environment gap to look into later.

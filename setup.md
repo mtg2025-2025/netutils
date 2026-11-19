@@ -34,19 +34,20 @@ Run this from the root of your clone of the repository. `${PWD}` is the current 
 PowerShell:
 
 ```
-docker run -it --rm --network agent-net -e HTTPS_PROXY=http://egress-proxy:8888 -e HTTP_PROXY=http://egress-proxy:8888 -v claude-auth:/claude-auth -v "${PWD}:/workspace" netutils-agent
+docker run -it --rm --network agent-net -e HTTPS_PROXY=http://egress-proxy:8888 -e HTTP_PROXY=http://egress-proxy:8888 -v claude-auth:/claude-auth -v "${PWD}:/workspace" -v "${PWD}/../agent-history:/root/.claude/projects" netutils-agent
 ```
 
 macOS, Linux or Git Bash:
 
 ```
-docker run -it --rm --network agent-net -e HTTPS_PROXY=http://egress-proxy:8888 -e HTTP_PROXY=http://egress-proxy:8888 -v claude-auth:/claude-auth -v "$(pwd):/workspace" netutils-agent
+docker run -it --rm --network agent-net -e HTTPS_PROXY=http://egress-proxy:8888 -e HTTP_PROXY=http://egress-proxy:8888 -v claude-auth:/claude-auth -v "$(pwd):/workspace" -v "$(pwd)/../agent-history:/root/.claude/projects" netutils-agent
 ```
 
 Then start the agent inside the container with `claude`. On the first run, Claude Code asks you to log in once. The login is saved in the `claude-auth` volume for later runs.
 
 - **Mounted path:** only this project folder, mounted at `/workspace`. The rest of the computer (home folder, Desktop, Downloads, SSH keys, cloud credentials) is not mounted.
 - **Network mode:** `agent-net` only, an internal network with no internet route. The `HTTPS_PROXY` and `HTTP_PROXY` settings point programs at the proxy, but the internal network is what enforces the boundary: even a program that ignores the proxy settings can't get out.
+- **Session history:** `../agent-history` (a folder next to the repository, not inside it) is mounted at `/root/.claude/projects`, where Claude Code saves each session's transcript and token usage. It survives after the container exits, so each run's usage can be reported with `python agent/tools/session_report.py`. It's kept out of the repository because transcripts include everything the agent read. Create the folder once before the first run: `mkdir ../agent-history`.
 - **Login storage:** `claude-auth` is a Docker named volume that saves the Claude Code login between runs. It stays outside the project folder, so the login can never be committed to Git.
 - **No ports opened:** the course command opens port 8501 for web apps. Netutils has no web app, so no ports are published.
 - **`--rm`:** the container is deleted when you exit. Only changes inside `/workspace` are kept.
@@ -137,6 +138,8 @@ Everything in the container outside the two mounts (`/workspace` and the `claude
 Three things persist. The first is the project folder, mounted at `/workspace`. The agent's code changes, new tests, output files and Git commits are written straight to my real Netutils folder on Windows, so they survive after the container exits and I can review them. I verified this by writing a test file to `/workspace` and finding it on Windows after exiting.
 
 The second is the `claude-auth` Docker volume, which holds only the Claude Code login so I don't have to log in every session. It's kept separate from the project folder, so the login can never be committed to Git.
+
+Session history is also kept, in the `agent-history` folder next to the repository. Claude Code writes each session's transcript and token usage there, so cost and effort can be measured for every run. It's a deliberate widening of what persists, recorded in the iteration log. The trade-off is that the agent can write to that one extra folder, and transcripts contain whatever the agent read, so the folder stays out of Git.
 
 The third is the Docker image itself, with its tools and dependencies. It's reused for every session, but the agent can't change it: each container writes to a temporary layer that's discarded on exit. The image only changes when I edit `Dockerfile.agent` and rebuild it.
 
