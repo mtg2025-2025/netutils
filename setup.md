@@ -46,9 +46,9 @@ docker run -it --rm --network agent-net -e HTTPS_PROXY=http://egress-proxy:8888 
 Then start the agent inside the container with `claude`. On the first run, Claude Code asks you to log in once. The login is saved in the `claude-auth` volume for later runs.
 
 - **Mounted path:** only this project folder, mounted at `/workspace`. The rest of the computer (home folder, Desktop, Downloads, SSH keys, cloud credentials) is not mounted.
-- **Network mode:** `agent-net` only, an internal network with no internet route. The `HTTPS_PROXY` and `HTTP_PROXY` settings point programs at the proxy, but the internal network is what enforces the boundary: even a program that ignores the proxy settings can't get out.
+- **Network mode:** `agent-net` only, an internal network with no internet route. The `HTTPS_PROXY` and `HTTP_PROXY` settings point programs at the proxy, but the internal network is what enforces the boundary: a program that ignores the proxy settings has no route out. The `--noproxy` test below confirmed this for `curl`.
 - **Session history:** `../agent-history` (a folder next to the repository, not inside it) is mounted at `/root/.claude/projects`, where Claude Code saves each session's transcript and token usage. It survives after the container exits, so each run's usage can be reported with `python agent/tools/session_report.py`. It's kept out of the repository because transcripts include everything the agent read. Create the folder once before the first run: `mkdir ../agent-history`.
-- **Login storage:** `claude-auth` is a Docker named volume that saves the Claude Code login between runs. It stays outside the project folder, so the login can never be committed to Git.
+- **Login storage:** `claude-auth` is a Docker named volume that saves the Claude Code login between runs. It's stored outside the project folder, so by default the login isn't part of anything committed to Git. The agent can still read the credential inside the container (see Remaining risks), so it could copy it into the project if it were misled. Reviewing changes before committing is the check for that.
 - **No ports opened:** the course command opens port 8501 for web apps. Netutils has no web app, so no ports are published.
 - **`--rm`:** the container is deleted when you exit. Only changes inside `/workspace` are kept.
 
@@ -78,7 +78,7 @@ ai-course:/workspace# curl -sS -m 10 -o /dev/null -w "%{http_code}\n" https://ap
 ai-course:/workspace#
 ```
 
-Result: a site not on the allowlist is refused by the proxy (403), bypassing the proxy fails because the network has no route out, and Anthropic's API is reachable (404 means the server answered).
+Result: in these tests, a site not on the allowlist (`example.com`) was refused by the proxy (403), bypassing the proxy failed because the network has no route out, and Anthropic's API was reachable (404 means the server answered). These checks confirm the cases tested. They don't prove that every other destination is unreachable. The design is what should block the rest: the internal network has no route out, and the proxy refuses any domain not on the allowlist (`FilterDefaultDeny Yes`). The proxy log from the smoke tests adds supporting evidence: it shows real requests to GitHub, npm and other sites being refused.
 
 ## Smoke test
 
@@ -115,7 +115,46 @@ The full summary the agent wrote is in `agent-smoke-test.md`, which is on the Wi
 | Skipped | 2     |
 ```
 
-**Verified afterward on Windows:** `git status` showed only the new, untracked files (`Dockerfile.agent`, `agent/`, `agent-smoke-test.md`, `setup.md`). No project files were modified, and nothing was committed or pushed.
+**Exact test command the agent ran** (recorded in `agent-smoke-test.md`):
+
+```
+PYTHONDONTWRITEBYTECODE=1 python -m pytest tests/unit -p no:cacheprovider \
+  -o addopts="--doctest-modules -p no:warnings --ignore-glob=*mock*"
+```
+
+This is the project's own pytest configuration from `pyproject.toml` without `-vv`. Turning off the cache and bytecode files keeps pytest from writing anything into the repository. (`agent-smoke-test.md` is dated 2026-11-19 because the container's clock uses UTC. On Windows it was the evening of 2026-11-18.)
+
+**Verified afterward on Windows:** `git status` showed only the new, untracked files (`Dockerfile.agent`, `agent/`, `agent-smoke-test.md`, `setup.md`). No project files were modified, and nothing was committed or pushed. The `git status` output wasn't saved at the time. The record that can be checked now is below.
+
+The summary file is on the Windows side of the mount, written during the session:
+
+```
+PS> Get-Item agent-smoke-test.md
+
+Mode   LastWriteTime         Length Name
+----   -------------         ------ ----
+-a---- 11/18/2026 7:55:18 PM   2600 agent-smoke-test.md
+```
+
+The commit that added the sandbox work contains only new files. None of Netutils' existing source or test files appear, and nothing was deleted:
+
+```
+PS> git show --stat 5023f60
+
+ .gitattributes             |   2 +
+ Dockerfile.agent           |  55 ++++++++++++++
+ agent-smoke-test.md        |  54 ++++++++++++++
+ agent/docker-entrypoint.sh |  34 +++++++++
+ agent/proxy/Dockerfile     |   5 ++
+ agent/proxy/allowlist.txt  |   4 +
+ agent/proxy/tinyproxy.conf |  11 +++
+ agent/settings.json        |   7 ++
+ agent/statusline.sh        | 127 ++++++++++++++++++++++++++++++++
+ setup.md                   | 178 +++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 477 insertions(+)
+```
+
+For future smoke tests, `git status` and `dir` are run on Windows right after the session, and their output is pasted here as is.
 
 **Expected failures:** the 4 failing tests in `tests/unit/test_dns.py` look up google.com and yahoo.com. The sandbox has no DNS access to the internet, so they fail. That's a sign the network boundary is working, not a code problem. On the earlier unrestricted network, the same suite was 840 passed, 0 failed.
 
@@ -127,21 +166,21 @@ These answers reflect the first version of this setup.
 
 ### Why mount only this folder?
 
-The agent's work (editing code, adding tests, running pytest and the linters, and making commits) only needs what's inside the Netutils project folder: the code, tests, `pyproject.toml`, `poetry.lock` and the Git history. Netutils is a self-contained library with no local services and no credentials, so nothing outside the folder is needed. Mounting only this folder means a mistake or a misled agent can't read or change anything else on my computer, such as my home folder, Desktop, Downloads, SSH keys or cloud credentials. Without this boundary, an agent that was tricked by malicious text could read my SSH keys and use them to get into other systems. The course repo isn't mounted either, because the files I needed from it were copied into the project. My GitHub login also stays out of the container: the agent can commit locally, and I review the work and push to GitHub myself.
+The agent's work (editing code, adding tests, running pytest and the linters, and making commits) only needs what's inside the Netutils project folder: the code, tests, `pyproject.toml`, `poetry.lock` and the Git history. Netutils is a self-contained library with no local services and no credentials, so nothing outside the folder is needed. Mounting only this folder means a mistake or a misled agent has no direct way to read or change anything else on my computer (short of escaping the container, see Remaining risks), such as my home folder, Desktop, Downloads, SSH keys or cloud credentials. Without this boundary, an agent that was tricked by malicious text could read my SSH keys and use them to get into other systems. The course repo isn't mounted either, because the files I needed from it were copied into the project. My GitHub login also stays out of the container: the agent can commit locally, and I review the work and push to GitHub myself.
 
 ### What is ephemeral?
 
-Everything in the container outside the two mounts (`/workspace` and the `claude-auth` login volume) is ephemeral. The container runs with `--rm`, so it's deleted on exit, along with `/tmp`, scratch files, temporary downloads, shell history and anything installed during the session. I verified this by writing a file to `/tmp`, exiting, and confirming it was gone. Every session starts fresh from the same image, so a mistake or a bad install in one session can't carry into the next.
+Everything in the container outside the two mounts (`/workspace` and the `claude-auth` login volume) is ephemeral. The container runs with `--rm`, so it's deleted on exit, along with `/tmp`, scratch files, temporary downloads, shell history and anything installed during the session. I verified this by writing a file to `/tmp`, exiting, and confirming it was gone. Every session starts fresh from the same image, so a bad install or scratch file doesn't carry into the next session. The exception is anything written to the persistent folders, `/workspace` or `agent-history`, which is why changes there are reviewed.
 
 ### What persists?
 
 Three things persist. The first is the project folder, mounted at `/workspace`. The agent's code changes, new tests, output files and Git commits are written straight to my real Netutils folder on Windows, so they survive after the container exits and I can review them. I verified this by writing a test file to `/workspace` and finding it on Windows after exiting.
 
-The second is the `claude-auth` Docker volume, which holds only the Claude Code login so I don't have to log in every session. It's kept separate from the project folder, so the login can never be committed to Git.
+The second is the `claude-auth` Docker volume, which holds only the Claude Code login so I don't have to log in every session. It's kept separate from the project folder, so by default the login isn't committed to Git. The agent can still read it, though, so separate storage lowers the risk without removing it.
 
 Session history is also kept, in the `agent-history` folder next to the repository. Claude Code writes each session's transcript and token usage there, so cost and effort can be measured for every run. It's a deliberate widening of what persists, recorded in the iteration log. The trade-off is that the agent can write to that one extra folder, and transcripts contain whatever the agent read, so the folder stays out of Git.
 
-The third is the Docker image itself, with its tools and dependencies. It's reused for every session, but the agent can't change it: each container writes to a temporary layer that's discarded on exit. The image only changes when I edit `Dockerfile.agent` and rebuild it.
+The third is the Docker image itself, with its tools and dependencies. It's reused for every session, but nothing the agent does inside a container changes the image: each container writes to a temporary layer that's discarded on exit. The image only changes when I edit `Dockerfile.agent` and rebuild it.
 
 The network setup also persists: the `agent-net` network and the `egress-proxy` container stay in place between sessions. The agent can't change them, because the proxy's allowlist is built into its image, outside the agent's container.
 
@@ -149,7 +188,18 @@ The network setup also persists: the `agent-net` network and the `egress-proxy` 
 
 The image starts from `python:3.12-slim`, because Netutils supports Python 3.10–3.14 and 3.12 matches the course image. On top of that I included:
 
-- Linux tools from the course image: git (so the agent can inspect history and commit), curl, bash, ca-certificates, nano and procps, plus Node.js and npm, which Claude Code needs.
+- Linux tools. Each one is kept for a specific reason. The base image, `python:3.12-slim`, has none of `ps`, `vi`, `vim` or `nano` (checked with `command -v` on 2026-11-19):
+
+| Tool | Why the agent environment needs it |
+|---|---|
+| `git` | The agent reads the project's history (`git log`, `git diff`), checks its own changes with `git status`, and makes local commits for me to review. |
+| `curl` | Downloads the Poetry installer at build time, and runs the egress checks (blocked and allowed requests) in this document. |
+| `ca-certificates` | Lets HTTPS connections verify certificates: Claude Code's calls to `api.anthropic.com` through the proxy, and `curl` at build time. |
+| `bash` | Runs the image's entrypoint script and the status line script, and is the shell Claude Code uses to run commands such as pytest. |
+| `procps` | Provides `ps`. Claude Code itself runs `ps -o ppid= -p <pid>`, `ps -o command= -p <pid>` and `ps -o lstart= -p <pid>` to track and clean up the processes it starts, such as a pytest run that has to be stopped. I found these commands in the Claude Code program installed in the image (version 2.1.327). Without `procps`, the slim image has no `ps`. |
+| `nano` | Claude Code opens a text editor for longer input, such as editing a prompt in an editor (Ctrl+G) or editing its memory file. When `EDITOR` isn't set, it looks for `code`, then `vi`, then `nano`. The slim image has none of them, so without `nano` those features would have no editor. It also lets me read or fix a file by hand inside the container. |
+| `nodejs`, `npm` | Install and run Claude Code, which is distributed through npm. |
+
 - Poetry 2.1.3, the package manager Netutils uses, pinned to the same version as the project's own Dockerfile.
 - Netutils' own dependencies, development tools and optional extras, installed with `poetry install --with dev --all-extras` from the project's `poetry.lock`. That gives the agent pytest and coverage for testing, ruff, pylint, mypy and yamllint (the same checks the project's CI runs), and the libraries the tests need.
 - Claude Code, the coding agent, with the course's settings and status line.
@@ -158,13 +208,13 @@ I removed the course's general Python packages (Streamlit, Flask, the Slack and 
 
 The separate proxy image contains only Alpine Linux and tinyproxy.
 
-### What the smoke test proved
+### What the smoke test showed
 
-- The image has everything the agent needs. Claude Code started and logged in through the proxy, and pytest ran the full suite: 836 passed, 4 failed, 2 skipped.
-- The network boundary holds. The only failures were the 4 DNS tests that need to look up google.com and yahoo.com. On the earlier unrestricted network, the same tests passed, so the difference comes from the boundary. Together with the egress check, this shows the agent can reach Anthropic's API and nothing else.
-- The agent could work using only the mounted folder. It found the project, its test settings and its Git history in `/workspace` with no access to anything else.
+- The image had everything this task needed. Claude Code started and logged in through the proxy, and pytest ran the full unit suite: 836 passed, 4 failed, 2 skipped. Later tasks may need more, and anything added will be justified the same way.
+- The network boundary held for this run. The only failures were the 4 DNS tests that need to look up google.com and yahoo.com. On the earlier unrestricted network, the same tests passed, so the difference comes from the boundary. Together with the egress check, this is consistent with the agent reaching Anthropic's API and being refused elsewhere. It confirms the cases tested, not every possible destination.
+- The agent could work using only the mounted folder. It found the project, its test settings and its Git history in `/workspace` without needing anything outside it.
 - Its output persisted. `agent-smoke-test.md` appeared in my Netutils folder on Windows after the container exited.
-- It stayed within its limits. `git status` on Windows afterward showed only new files, with no project files modified and nothing committed or pushed.
+- It stayed within its limits. `git status` on Windows afterward showed only new files, with no project files modified and nothing committed or pushed. The commit record above (`git show --stat 5023f60`: only new files, no deletions) is the evidence that can still be checked.
 
 The first run also surfaced a real problem: Git inside the container saw about 610 files as changed because of Windows line endings. I fixed that in the Dockerfile before letting any agent make commits.
 

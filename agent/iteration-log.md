@@ -59,6 +59,21 @@ Format: **Date. What was tried.** What happened (evidence). What changed.
 - **Evidence it works:** on the current repo, 16 checks ran with 0 failures. With planted damage (escaped Markdown, an empty `Dockerfile.txt`, a fake `sk-ant-` key, a Windows user path and a BOM in a `.sh` file), it reported 4 failures covering all of them and exited with code 1.
 - **Capstone note:** this is a candidate for a CI guardrail (a GitHub Action that runs the checkup on every pull request).
 
+## 2026-11-19: Grader feedback on Exercise 2 (7/8), applied to setup.md
+
+- **Feedback:** Sandboxed Environment scored 3/4 and Governance, Security and CI/CD scored 4/4. The submission passed and doesn't need resubmitting. The grader raised four points:
+  1. `nano` and `procps` were described as "inherited from the course image" instead of being tied to a task.
+  2. The smoke test relied on the agent's own reply, without the exact pytest command or host-side output.
+  3. "The login can never be committed" was too absolute, given that the agent can read the credential.
+  4. The egress checks were described as if they proved every other destination is unreachable.
+- **Investigated (point 1):** `python:3.12-slim` has no `ps`, `vi`, `vim` or `nano` (`command -v` in the base image). The Claude Code program in the agent image (version 2.1.327) runs `ps -o ppid=`, `ps -o command=` and `ps -o lstart=` to track and clean up the processes it starts. When `EDITOR` isn't set, it looks for `code`, then `vi`, then `nano` as its text editor. **Decision:** keep both. They have identified needs. Removing them was the alternative, and it was rejected: Claude Code's process handling would be missing `ps`, and its editor features would have no editor.
+- **Changed in `setup.md`:**
+  - a table giving each Linux tool's reason (point 1)
+  - the exact pytest command from `agent-smoke-test.md`, plus host-side evidence: `Get-Item agent-smoke-test.md` and `git show --stat 5023f60`, which shows only new files and no deletions (point 2)
+  - qualified wording for the login, the mount boundary, ephemerality and the image (point 3)
+  - egress results scoped to the cases tested, with the design (an internal network and a default-deny proxy) as the reason the rest should be blocked (point 4)
+- **Process change:** after every agent run, paste the host-side `git status` and file listing as is, at the time. The Exercise 2 `git status` output wasn't saved, so the commit record had to stand in for it. The grader's four points are now a checklist for every write-up before it's submitted.
+
 ## Open items
 
 - Run `python agent/tools/session_report.py` after every agent session and record the numbers here. They make up the baseline that the capstone compares against. Note the `$:` cost from the Claude Code status line before exiting, because the transcript records tokens but not cost.
