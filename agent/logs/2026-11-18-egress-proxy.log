@@ -1,0 +1,379 @@
+NOTICE    Nov 19 01:43:08.466 [1]: Initializing tinyproxy ...
+NOTICE    Nov 19 01:43:08.466 [1]: Reloading config file (/etc/tinyproxy/tinyproxy.conf)
+INFO      Nov 19 01:43:08.466 [1]: Added address [0.0.0.0] to listen addresses.
+INFO      Nov 19 01:43:08.466 [1]: Adding Port [443] to the list allowed by CONNECT
+WARNING   Nov 19 01:43:08.466 [1]: You SHOULD set a UserName in the config file. Using current user instead.
+NOTICE    Nov 19 01:43:08.466 [1]: Reloading config file finished
+INFO      Nov 19 01:43:08.466 [1]: listen_sock called with addr = '0.0.0.0'
+INFO      Nov 19 01:43:08.466 [1]: trying to listen on host[0.0.0.0], family[2], socktype[1], proto[6]
+INFO      Nov 19 01:43:08.466 [1]: listening on fd [3]
+INFO      Nov 19 01:43:08.466 [1]: Setting the various signals.
+INFO      Nov 19 01:43:08.466 [1]: Starting main loop. Accepting connections.
+CONNECT   Nov 19 01:49:32.618 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:49:32.618 [1]: Request (file descriptor 4): CONNECT example.com:443 HTTP/1.1
+NOTICE    Nov 19 01:49:32.618 [1]: Proxying refused on filtered domain "example.com"
+CONNECT   Nov 19 01:50:38.052 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:50:38.052 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:50:38.052 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:50:38.052 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:50:38.116 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:50:38.129 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Nov 19 01:50:38.129 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:50:38.287 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+CONNECT   Nov 19 01:54:04.756 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:04.760 [1]: Connect (file descriptor 5): 172.18.0.3
+CONNECT   Nov 19 01:54:04.761 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:04.761 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:04.761 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:04.761 [1]: Request (file descriptor 5): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:04.761 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:04.761 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:04.769 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:04.769 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:04.785 [1]: Established connection to host "api.anthropic.com" using file descriptor 6.
+INFO      Nov 19 01:54:04.785 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:04.791 [1]: Established connection to host "api.anthropic.com" using file descriptor 7.
+INFO      Nov 19 01:54:04.791 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:04.969 [1]: Closed connection between local client (fd:5) and remote client (fd:6)
+INFO      Nov 19 01:54:04.975 [1]: Closed connection between local client (fd:4) and remote client (fd:7)
+CONNECT   Nov 19 01:54:05.179 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:05.179 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.179 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.179 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.181 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.203 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Nov 19 01:54:05.203 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:05.393 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+CONNECT   Nov 19 01:54:05.404 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:05.404 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.404 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.404 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.405 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.422 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Nov 19 01:54:05.422 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:05.560 [1]: Connect (file descriptor 6): 172.18.0.3
+CONNECT   Nov 19 01:54:05.560 [1]: Request (file descriptor 6): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.560 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.560 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.562 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.581 [1]: Established connection to host "api.anthropic.com" using file descriptor 7.
+INFO      Nov 19 01:54:05.581 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:05.608 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+CONNECT   Nov 19 01:54:05.613 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:05.614 [1]: Request (file descriptor 4): CONNECT raw.githubusercontent.com:443 HTTP/1.1
+NOTICE    Nov 19 01:54:05.614 [1]: Proxying refused on filtered domain "raw.githubusercontent.com"
+CONNECT   Nov 19 01:54:05.614 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:05.616 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.616 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.616 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.617 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.636 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Nov 19 01:54:05.636 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:05.757 [1]: Connect (file descriptor 8): 172.18.0.3
+CONNECT   Nov 19 01:54:05.757 [1]: Request (file descriptor 8): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.757 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.757 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.759 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.775 [1]: Established connection to host "api.anthropic.com" using file descriptor 9.
+INFO      Nov 19 01:54:05.775 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:05.794 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+CONNECT   Nov 19 01:54:05.850 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:05.851 [1]: Connect (file descriptor 5): 172.18.0.3
+CONNECT   Nov 19 01:54:05.852 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:54:05.864 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.864 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.864 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.864 [1]: Request (file descriptor 5): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.864 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.864 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.864 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.864 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.864 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.866 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:05.866 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:05.866 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.885 [1]: Established connection to host "api.anthropic.com" using file descriptor 13.
+INFO      Nov 19 01:54:05.885 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:05.885 [1]: Established connection to host "api.anthropic.com" using file descriptor 12.
+INFO      Nov 19 01:54:05.885 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:05.885 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:54:05.885 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:05.937 [1]: Connect (file descriptor 14): 172.18.0.3
+CONNECT   Nov 19 01:54:05.937 [1]: Request (file descriptor 14): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.937 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.937 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.938 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.942 [1]: Connect (file descriptor 16): 172.18.0.3
+CONNECT   Nov 19 01:54:05.942 [1]: Request (file descriptor 16): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.942 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.942 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.943 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.944 [1]: Connect (file descriptor 18): 172.18.0.3
+CONNECT   Nov 19 01:54:05.944 [1]: Request (file descriptor 18): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:05.944 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:05.944 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:05.945 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:05.960 [1]: Established connection to host "api.anthropic.com" using file descriptor 17.
+INFO      Nov 19 01:54:05.960 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:05.960 [1]: Established connection to host "api.anthropic.com" using file descriptor 15.
+INFO      Nov 19 01:54:05.960 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:05.960 [1]: Established connection to host "api.anthropic.com" using file descriptor 19.
+INFO      Nov 19 01:54:05.960 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:06.049 [1]: Closed connection between local client (fd:5) and remote client (fd:11)
+INFO      Nov 19 01:54:06.074 [1]: Closed connection between local client (fd:4) and remote client (fd:12)
+INFO      Nov 19 01:54:06.122 [1]: Closed connection between local client (fd:18) and remote client (fd:19)
+INFO      Nov 19 01:54:06.159 [1]: Closed connection between local client (fd:10) and remote client (fd:13)
+INFO      Nov 19 01:54:06.161 [1]: Closed connection between local client (fd:16) and remote client (fd:17)
+CONNECT   Nov 19 01:54:06.168 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:06.168 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.168 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.168 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:06.169 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.184 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Nov 19 01:54:06.184 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 11): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 12): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 13): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 16): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 17): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 19): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 18): 172.18.0.3
+CONNECT   Nov 19 01:54:06.184 [1]: Connect (file descriptor 20): 172.18.0.3
+CONNECT   Nov 19 01:54:06.185 [1]: Connect (file descriptor 21): 172.18.0.3
+CONNECT   Nov 19 01:54:06.185 [1]: Connect (file descriptor 22): 172.18.0.3
+CONNECT   Nov 19 01:54:06.185 [1]: Connect (file descriptor 23): 172.18.0.3
+CONNECT   Nov 19 01:54:06.185 [1]: Connect (file descriptor 24): 172.18.0.3
+CONNECT   Nov 19 01:54:06.186 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.186 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.186 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.186 [1]: Request (file descriptor 11): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.186 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.186 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.186 [1]: Request (file descriptor 12): CONNECT api.anthropic.com:443 HTTP/1.1
+CONNECT   Nov 19 01:54:06.186 [1]: Request (file descriptor 13): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.186 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.186 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:06.186 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.186 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.186 [1]: Request (file descriptor 17): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.186 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.186 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.186 [1]: Request (file descriptor 16): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.187 [1]: Request (file descriptor 18): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.187 [1]: Request (file descriptor 19): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.187 [1]: Request (file descriptor 20): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.187 [1]: Request (file descriptor 21): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.187 [1]: Request (file descriptor 22): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.187 [1]: Request (file descriptor 23): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.187 [1]: Request (file descriptor 24): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.187 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.187 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:06.189 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.189 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.190 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.190 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.190 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.190 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.190 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.191 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.191 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.191 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.191 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.191 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+INFO      Nov 19 01:54:06.191 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.202 [1]: Established connection to host "api.anthropic.com" using file descriptor 28.
+INFO      Nov 19 01:54:06.202 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.202 [1]: Established connection to host "api.anthropic.com" using file descriptor 26.
+INFO      Nov 19 01:54:06.202 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.202 [1]: Established connection to host "api.anthropic.com" using file descriptor 32.
+INFO      Nov 19 01:54:06.203 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.209 [1]: Established connection to host "api.anthropic.com" using file descriptor 30.
+INFO      Nov 19 01:54:06.209 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.209 [1]: Established connection to host "api.anthropic.com" using file descriptor 31.
+INFO      Nov 19 01:54:06.209 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 29.
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 34.
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 25.
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 27.
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 35.
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 36.
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 33.
+CONNECT   Nov 19 01:54:06.210 [1]: Established connection to host "api.anthropic.com" using file descriptor 37.
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:06.210 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:06.399 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+CONNECT   Nov 19 01:54:06.748 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:06.748 [1]: Connect (file descriptor 5): 172.18.0.3
+CONNECT   Nov 19 01:54:06.806 [1]: Connect (file descriptor 38): 172.18.0.3
+CONNECT   Nov 19 01:54:06.844 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+CONNECT   Nov 19 01:54:06.844 [1]: Request (file descriptor 5): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:06.844 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.844 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:06.844 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:06.844 [1]: opensock: opening connection to api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.844 [1]: Request (file descriptor 38): CONNECT downloads.claude.ai:443 HTTP/1.1
+NOTICE    Nov 19 01:54:06.844 [1]: Proxying refused on filtered domain "downloads.claude.ai"
+INFO      Nov 19 01:54:06.845 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.858 [1]: Established connection to host "api.anthropic.com" using file descriptor 38.
+INFO      Nov 19 01:54:06.858 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:06.859 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:06.879 [1]: Established connection to host "api.anthropic.com" using file descriptor 39.
+INFO      Nov 19 01:54:06.879 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:07.014 [1]: Closed connection between local client (fd:4) and remote client (fd:39)
+INFO      Nov 19 01:54:07.019 [1]: Closed connection between local client (fd:10) and remote client (fd:26)
+INFO      Nov 19 01:54:07.028 [1]: Closed connection between local client (fd:18) and remote client (fd:32)
+INFO      Nov 19 01:54:07.045 [1]: Closed connection between local client (fd:16) and remote client (fd:30)
+INFO      Nov 19 01:54:07.089 [1]: Closed connection between local client (fd:13) and remote client (fd:27)
+INFO      Nov 19 01:54:07.094 [1]: Closed connection between local client (fd:12) and remote client (fd:28)
+INFO      Nov 19 01:54:07.116 [1]: Closed connection between local client (fd:11) and remote client (fd:25)
+INFO      Nov 19 01:54:07.121 [1]: Closed connection between local client (fd:20) and remote client (fd:33)
+INFO      Nov 19 01:54:07.152 [1]: Closed connection between local client (fd:5) and remote client (fd:38)
+CONNECT   Nov 19 01:54:07.162 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:07.162 [1]: Request (file descriptor 4): CONNECT mcp-proxy.anthropic.com:443 HTTP/1.1
+NOTICE    Nov 19 01:54:07.162 [1]: Proxying refused on filtered domain "mcp-proxy.anthropic.com"
+INFO      Nov 19 01:54:07.173 [1]: Closed connection between local client (fd:24) and remote client (fd:37)
+INFO      Nov 19 01:54:07.192 [1]: Closed connection between local client (fd:23) and remote client (fd:36)
+INFO      Nov 19 01:54:07.203 [1]: Closed connection between local client (fd:17) and remote client (fd:29)
+INFO      Nov 19 01:54:07.228 [1]: Closed connection between local client (fd:22) and remote client (fd:35)
+INFO      Nov 19 01:54:07.248 [1]: Closed connection between local client (fd:21) and remote client (fd:34)
+INFO      Nov 19 01:54:07.297 [1]: Closed connection between local client (fd:19) and remote client (fd:31)
+CONNECT   Nov 19 01:54:08.101 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:08.101 [1]: Request (file descriptor 4): CONNECT github.com:443 HTTP/1.1
+NOTICE    Nov 19 01:54:08.101 [1]: Proxying refused on filtered domain "github.com"
+CONNECT   Nov 19 01:54:15.360 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:15.360 [1]: Request (file descriptor 4): CONNECT registry.npmjs.org:443 HTTP/1.1
+NOTICE    Nov 19 01:54:15.360 [1]: Proxying refused on filtered domain "registry.npmjs.org"
+CONNECT   Nov 19 01:54:20.815 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:20.815 [1]: Request (file descriptor 4): CONNECT http-intake.logs.us5.datadoghq.com:443 HTTP/1.1
+NOTICE    Nov 19 01:54:20.815 [1]: Proxying refused on filtered domain "http-intake.logs.us5.datadoghq.com"
+CONNECT   Nov 19 01:54:27.418 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:27.419 [1]: Request (file descriptor 4): CONNECT api.github.com:443 HTTP/1.1
+NOTICE    Nov 19 01:54:27.419 [1]: Proxying refused on filtered domain "api.github.com"
+CONNECT   Nov 19 01:54:27.435 [1]: Connect (file descriptor 4): 172.18.0.3
+CONNECT   Nov 19 01:54:27.435 [1]: Request (file descriptor 4): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:27.435 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:27.435 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:27.437 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:27.453 [1]: Established connection to host "api.anthropic.com" using file descriptor 5.
+INFO      Nov 19 01:54:27.453 [1]: Not sending client headers to remote machine
+CONNECT   Nov 19 01:54:30.580 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:54:30.580 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:54:30.580 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:54:30.580 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:54:30.582 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:54:30.599 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:54:30.599 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:54:30.780 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:08.503 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:08.503 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:08.503 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:08.503 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:08.509 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:08.525 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:08.525 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:08.696 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:08.718 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:08.718 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:08.718 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:08.718 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:08.720 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:08.738 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:08.738 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:08.859 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:08.888 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:08.888 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:08.888 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:08.888 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:08.889 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:08.905 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:08.905 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:09.013 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:09.028 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:09.028 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:09.028 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:09.028 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:09.029 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:09.050 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:09.050 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:09.176 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:09.188 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:09.188 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:09.188 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:09.188 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:09.190 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:09.204 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:09.204 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:09.348 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:09.368 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:09.368 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:09.368 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:09.368 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:09.370 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:09.387 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:09.387 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:09.550 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:09.561 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:09.561 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:09.561 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:09.561 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:09.563 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:09.579 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:09.579 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:09.717 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:09.729 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:09.729 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:09.729 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:09.729 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:09.730 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:09.750 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:09.750 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:09.883 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:55:26.488 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:55:26.489 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:55:26.489 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:55:26.489 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:55:26.493 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:55:26.509 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:55:26.509 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:55:26.599 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:58:31.811 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:58:31.812 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:58:31.812 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:58:31.812 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:58:31.916 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:58:31.931 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:58:31.931 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:58:32.163 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+CONNECT   Nov 19 01:58:32.299 [1]: Connect (file descriptor 10): 172.18.0.3
+CONNECT   Nov 19 01:58:32.299 [1]: Request (file descriptor 10): CONNECT api.anthropic.com:443 HTTP/1.1
+INFO      Nov 19 01:58:32.299 [1]: No upstream proxy for api.anthropic.com
+INFO      Nov 19 01:58:32.299 [1]: opensock: opening connection to api.anthropic.com:443
+INFO      Nov 19 01:58:32.300 [1]: opensock: getaddrinfo returned for api.anthropic.com:443
+CONNECT   Nov 19 01:58:32.317 [1]: Established connection to host "api.anthropic.com" using file descriptor 11.
+INFO      Nov 19 01:58:32.317 [1]: Not sending client headers to remote machine
+INFO      Nov 19 01:58:32.502 [1]: Closed connection between local client (fd:10) and remote client (fd:11)
+INFO      Nov 19 01:58:32.622 [1]: Closed connection between local client (fd:14) and remote client (fd:15)
+INFO      Nov 19 01:58:32.622 [1]: Closed connection between local client (fd:4) and remote client (fd:5)
+INFO      Nov 19 01:58:32.622 [1]: Closed connection between local client (fd:8) and remote client (fd:9)
+INFO      Nov 19 01:58:32.622 [1]: Closed connection between local client (fd:6) and remote client (fd:7)
