@@ -4,16 +4,18 @@ This is a running record of what was tried, what happened, and what changed as a
 
 Format: **Date. What was tried.** What happened (evidence). What changed.
 
+Naming: the course is split into sections (Module 1.1, 1.2, 2.1 and so on), and exercise numbers restart in each section. Work is always labeled with the full name, for example "Module 1.1, Exercise 2". Commit `5023f60` says "Module 1, Exercise 2". That means Module 1.1, and the message was left as is because the commit was already pushed.
+
 ---
 
-## 2026-11-18: Module 1, Exercise 1. Choosing the Target Codebase
+## 2026-11-18: Module 1.1, Exercise 1. Choosing the Target Codebase
 
 - **Tried:** two candidates, `networktocode/netutils` and `alxgb/sip-parser`.
 - **Evidence:** Netutils' last release was v1.19.2 (2026-09-23), with 32 open issues and 840 unit tests plus 117 doctests passing. sip-parser's last commit was in 2019, it had 21 commits in total, and its README says the tests are incomplete.
 - **Decision:** forked Netutils to `mtg2025-2025/netutils`. The planned improvements are issues #765 (LibreNMS mappings), #27 (IP randomization helper) and #859 (consecutive Cisco banners).
 - **Note:** the tests can't run natively on Windows, because `netutils/password.py` imports `crypt`, which only exists on Linux. They have to run in a Linux container.
 
-## 2026-11-18: Module 1, Exercise 2. First container build
+## 2026-11-18: Module 1.1, Exercise 2. First container build
 
 - **Tried:** copied the course's `module_1/Dockerfile` as `Dockerfile.agent`. It was renamed so it doesn't overwrite the project's own `Dockerfile`, which CI uses. Replaced the course's general Python packages with `poetry install --with dev --all-extras`, and removed OpenCode and ngrok.
 - **Evidence:** the first build ran, but in the container pytest had 64 collection errors: `PackageNotFoundError: No package metadata was found for netutils`. Netutils reads its own installed version at import time, so the dependencies alone weren't enough.
@@ -33,7 +35,7 @@ Format: **Date. What was tried.** What happened (evidence). What changed.
 
 ## 2026-11-18: Self-review against the exercise rubric, then network egress
 
-- **Tried:** checked the submission against the Exercise 2 rubric before submitting.
+- **Tried:** checked the submission against the Module 1.1, Exercise 2 rubric before submitting.
 - **Evidence:** the rubric's Proficient level requires "a network egress check… the curl output confirms that outbound requests fail". Docker's default network allowed all outbound traffic, which the rubric lists as Developing ("network egress is unconstrained").
 - **Changed:** added an allowlist egress proxy (`agent/proxy/`) and an internal Docker network (`agent-net`). See [ADR 0001](adr/0001-agent-network-egress.md).
 - **Result:** `curl https://example.com` failed with 403, and bypassing the proxy failed with "Could not resolve host". `api.anthropic.com` was reachable, and Claude Code worked normally.
@@ -54,12 +56,12 @@ Format: **Date. What was tried.** What happened (evidence). What changed.
 
 ## 2026-11-18: End-of-exercise checkup
 
-- **Tried:** reviewed the problems that came up during Exercise 2: Notepad escaping Markdown, Notepad saving `Dockerfile` as `Dockerfile.txt` (and once emptying it), Windows line endings in shell scripts, and a personal Windows path in `setup.md`. Each was caught by hand, some only after the files had been submitted.
+- **Tried:** reviewed the problems that came up during Module 1.1, Exercise 2: Notepad escaping Markdown, Notepad saving `Dockerfile` as `Dockerfile.txt` (and once emptying it), Windows line endings in shell scripts, and a personal Windows path in `setup.md`. Each was caught by hand, some only after the files had been submitted.
 - **Changed:** added `agent/tools/checkup.py`, a deterministic checkup to run at the end of every exercise. It checks for required and empty files, `.txt` misnames, Markdown damage, BOM and encoding problems, LF line endings for scripts, secrets and personal paths, transcripts kept out of the repo, whether everything is committed and pushed, and whether the iteration log is current. With `--docker` it also rebuilds both images, confirms egress is blocked and the API is reachable, and reruns the tests.
 - **Evidence it works:** on the current repo, 16 checks ran with 0 failures. With planted damage (escaped Markdown, an empty `Dockerfile.txt`, a fake `sk-ant-` key, a Windows user path and a BOM in a `.sh` file), it reported 4 failures covering all of them and exited with code 1.
 - **Capstone note:** this is a candidate for a CI guardrail (a GitHub Action that runs the checkup on every pull request).
 
-## 2026-11-19: Grader feedback on Exercise 2 (7/8), applied to setup.md
+## 2026-11-19: Grader feedback on Module 1.1, Exercise 2 (7/8), applied to setup.md
 
 - **Feedback:** Sandboxed Environment scored 3/4 and Governance, Security and CI/CD scored 4/4. The submission passed and doesn't need resubmitting. The grader raised four points:
   1. `nano` and `procps` were described as "inherited from the course image" instead of being tied to a task.
@@ -72,7 +74,7 @@ Format: **Date. What was tried.** What happened (evidence). What changed.
   - the exact pytest command from `agent-smoke-test.md`, plus host-side evidence: `Get-Item agent-smoke-test.md` and `git show --stat 5023f60`, which shows only new files and no deletions (point 2)
   - qualified wording for the login, the mount boundary, ephemerality and the image (point 3)
   - egress results scoped to the cases tested, with the design (an internal network and a default-deny proxy) as the reason the rest should be blocked (point 4)
-- **Process change:** after every agent run, paste the host-side `git status` and file listing as is, at the time. The Exercise 2 `git status` output wasn't saved, so the commit record had to stand in for it. The grader's four points are now a checklist for every write-up before it's submitted.
+- **Process change:** after every agent run, paste the host-side `git status` and file listing as is, at the time. The Module 1.1, Exercise 2 `git status` output wasn't saved, so the commit record had to stand in for it. The grader's four points are now a checklist for every write-up before it's submitted.
 
 ## Open items
 

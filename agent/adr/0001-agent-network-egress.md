@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-11-18
-- **Context source:** Module 1, Exercise 2 (agent sandbox)
+- **Context source:** Module 1.1, Exercise 2 (agent sandbox)
 
 ## Context
 
@@ -25,7 +25,7 @@ The internal network enforces the boundary, not the `HTTPS_PROXY` setting. A pro
 
 | Alternative | Why rejected | Evidence |
 |---|---|---|
-| **Docker's default bridge network** (no restriction) | Egress is unconstrained, so the agent could reach any host. | This was the first configuration, used in smoke test 1. Self-review against the Exercise 2 rubric rated it "Developing: network egress is unconstrained". |
+| **Docker's default bridge network** (no restriction) | Egress is unconstrained, so the agent could reach any host. | This was the first configuration, used in smoke test 1. Self-review against the Module 1.1, Exercise 2 rubric rated it "Developing: network egress is unconstrained". |
 | **`--network none`** (no network at all) | Claude Code can't reach Anthropic's API, so the agent can't work. | Claude Code sends every request to `api.anthropic.com`. With no network, the container has no route to it. |
 | **Host firewall rules** (Windows Firewall or iptables on the Docker host) | Rules would live outside the repository, differ between Windows, macOS and Linux, and couldn't be forked or reviewed with the code. | The capstone requires a forkable repo that a stranger can run in under 15 minutes. |
 | **A full proxy such as Squid** | It would also work, but it's heavier and needs more configuration than this allowlist requires. | tinyproxy's whole configuration is 11 lines, and the image is Alpine (about 8 MB). |
