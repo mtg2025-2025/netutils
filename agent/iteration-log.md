@@ -95,7 +95,7 @@ Naming: the course is split into sections (Module 1.1, 1.2, 2.1 and so on), and 
   | Session | Transcript | Start (UTC) | Minutes | Prompts | API calls | Tokens in | Tokens out | `$:` cost |
   |---|---|---|---|---|---|---|---|---|
   | A | 39d3ee7d | 17:21 | 5.0 | 1 | 8 | 376,158 | 4,945 | not noted |
-  | B | 154c65ab | 17:25 | 42.5 (until /exit) | 1 (the report shows 4: /exit adds 3 lines) | 7 | 289,988 | 6,727 | not noted |
+  | B | 154c65ab | 17:25 | 42.5 (until /exit) | 1 (the report shows 4: /exit adds 3 lines) | 7 | 289,988 | 6,727 | $0.36 (status line before /exit) |
 
   Session A finished before Session B got going, so the runs overlapped by only about 1 minute. `session_report.py` counts `/exit` and its caveat lines as prompts. Session B's transcript has one real prompt.
 - **Host-side evidence, before committing:**
