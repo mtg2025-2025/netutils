@@ -76,8 +76,52 @@ Naming: the course is split into sections (Module 1.1, 1.2, 2.1 and so on), and 
   - egress results scoped to the cases tested, with the design (an internal network and a default-deny proxy) as the reason the rest should be blocked (point 4)
 - **Process change:** after every agent run, paste the host-side `git status` and file listing as is, at the time. The Module 1.1, Exercise 2 `git status` output wasn't saved, so the commit record had to stand in for it. The grader's four points are now a checklist for every write-up before it's submitted.
 
+## 2026-11-19: Module 1.2 lesson practice (course repo, not graded)
+
+- **Tried:** the lesson's two-worktree, two-container workflow on the course's sandbox example repo (LaunchCodeAgenticEngineer), before running it on Netutils.
+- **Evidence:** Git inside a worktree container failed: `fatal: not a git repository: /workspace/C:/Users/JEREMY/Projects/LaunchCodeAgenticEngineer/.git/worktrees/repo-agent-b`. A worktree's `.git` is a one-line file pointing at the main repo by its Windows path, and that path doesn't exist inside the Linux container. Review also caught a docstring example with the wrong output (7 mask characters where the real output had 6) and a README file tree missing a file. `git diff main` doesn't show untracked files.
+- **Changed for the exercise:** agents get no Git commands, and all commits and merges happen on the Windows host. New files are made visible to `git diff` with `git add -N`. Merges use `--no-edit` so Git doesn't open an editor. Agent claims are checked against real output, not trusted.
+
+## 2026-11-20: Module 1.2, Exercise 1. Two parallel agent sessions on Netutils
+
+- **Scope contract:** `session_tasks.md`, committed in 4a67b4a before the worktrees were created.
+  - Session A (`feature/lint-report`, worktree `../netutils-lint-report`): run ruff, pylint and mypy on `netutils/` and write `agent/reports/lint-report.md`.
+  - Session B (`feature/vlan-tests`, worktree `../netutils-vlan-tests`): add edge-case tests for `netutils/vlan.py` in `tests/unit/test_vlan.py`.
+  - Chosen from 5 audited candidates. The others were tests for `lib_helpers.py`, a docstring example for `running_config.py`, and a developer note on `lib_mapper.py`. These two were picked because they have fully separate write scopes, one changes no code at all, and the user can judge VLAN behaviour from network experience.
+- **Decision: the sandbox `docker run` for both containers, not the exercise's basic command.** The exercise's command has no `--network` or proxy settings, so it would have dropped the Module 1.1 egress boundary. Both containers ran on `agent-net` with `HTTPS_PROXY=http://egress-proxy:8888`, each mounting only its own worktree. `docker inspect` confirmed the mounts: `eloquent_shaw` used `netutils-lint-report`, and `nervous_merkle` used `netutils-vlan-tests`. See ADR 0002.
+- **Decision: no Git inside the agent containers.** The alternatives were relative worktree paths (`git worktree add --relative-paths`) plus mounting the main `.git` into each container, which was rejected. It would give the agent write access to the shared `.git` database that every worktree uses, which breaks the isolation the exercise is about. See ADR 0002.
+- **Runs:** each session got one task prompt, with no corrective prompts.
+
+  | Session | Transcript | Start (UTC) | Minutes | Prompts | API calls | Tokens in | Tokens out | `$:` cost |
+  |---|---|---|---|---|---|---|---|---|
+  | A | 39d3ee7d | 17:21 | 5.0 | 1 | 8 | 376,158 | 4,945 | not noted |
+  | B | 154c65ab | 17:25 | 42.5 (until /exit) | 1 (the report shows 4: /exit adds 3 lines) | 7 | 289,988 | 6,727 | not noted |
+
+  Session A finished before Session B got going, so the runs overlapped by only about 1 minute. `session_report.py` counts `/exit` and its caveat lines as prompts. Session B's transcript has one real prompt.
+- **Host-side evidence, before committing:**
+  - `git status --short -uall` in `netutils-lint-report`: `?? agent/reports/lint-report.md`.
+  - `git status --short` and `git diff --stat` in `netutils-vlan-tests`: ` M tests/unit/test_vlan.py`, `tests/unit/test_vlan.py | 152 ++++`, 1 file changed, 152 insertions(+).
+  - `agent-sandbox` itself had no changes.
+- **Review findings:**
+  - Session A: the linters reported zero findings (ruff "All checks passed", pylint 10.00/10, mypy "no issues found in 35 source files"). The agent then reviewed about 90 inline suppressions. Its top finding was verified in the code: `netutils/acl.py:521` raises `UnboundLocalError` when `ACLRules.match` has no rules.
+  - Session B: an independent run in a separate `python:3.12-slim` container gave `57 passed, 6 xfailed`. All 4 bugs the agent reported were reproduced. The worst: `vlanlist_to_config([1,2,3], min_grouping_size=4)` gives `['1,2']`. `ruff check` passes, and `ruff format --check` with the project config passes. A first format check outside the repo gave a false alarm, because it used ruff's default line length instead of the project's 120.
+  - Both agents ran shell tools outside the allowed command list. Session A ran ls, cat, grep and sed -n, which is only visible in its transcript. Session B ran cat, ls, md5sum and sed, and listed them itself. No file outside either write scope changed.
+- **Merges into `agent-sandbox`:** Session A was a fast-forward (`4a67b4a..e9f1436`). Session B was an ort merge, commit `0e6063a`. There were no conflicts.
+- **After the merge:** the full unit suite gave `880 passed, 4 failed, 2 skipped, 6 xfailed`. The 4 failures are the DNS tests, which are expected in the sandbox. Before: 836 passed, 4 failed, 2 skipped.
+- **Results recorded** in `session_tasks.md` (0a7b268, f4b2475). Pushed `c9d8fa2..f4b2475`. Submitted 2026-11-20. Answers saved in the course notes.
+- **Lessons:**
+  - The command limits were only requested in the prompt, so both agents used tools outside the list. Enforce them with Claude Code permission rules in the container instead.
+  - Write the empty-result case into the task, for example what to do if the linters find nothing.
+  - Say how to handle bugs found while writing tests.
+  - Start both sessions back to back so they really run in parallel.
+  - Capture `git log --oneline main..branch` before merging, because after the merge it prints nothing.
+
 ## Open items
 
+- File the 4 `netutils/vlan.py` bugs as GitHub issues and add each issue number to its xfail reason in `tests/unit/test_vlan.py` (Module 1.2, Exercise 1 follow-up).
+- The top 5 items in `agent/reports/lint-report.md` are candidate tasks for future agent sessions. The first is the `acl.py:521` empty-rules crash.
+- Turn each session's allowed command list into Claude Code permission rules (allow and deny) in the agent container, instead of relying on the prompt.
+- `session_report.py` counts `/exit` and its caveat lines as prompts. Count only real user prompts.
 - Run `python agent/tools/session_report.py` after every agent session and record the numbers here. They make up the baseline that the capstone compares against. Note the `$:` cost from the Claude Code status line before exiting, because the transcript records tokens but not cost.
 - Decide whether `downloads.claude.ai` should be allowed. Blocking it stops Claude Code from updating itself inside the container, which is arguably what we want, since the image should only change when it's rebuilt.
 - Two tests are skipped because `napalm` can't import `pkg_resources`. This is an environment gap to look into later.
