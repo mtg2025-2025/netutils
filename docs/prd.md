@@ -37,3 +37,27 @@ repo root. The trigger is manual; there is no automated hook.
 6. (Gate) No file other than agent/reports/test-summary.md was created or changed
    (checked with `git status`).
 7. (Gate) The agent did not commit, push, or install anything.
+
+## Why this task
+Chosen over three alternatives (added 2026-11-23 after Run 002; records the reasoning
+and edge cases; no acceptance criterion or the pass threshold changed):
+- Lint and summarize: in Module 1.2, Exercise 1, ruff, pylint and mypy all came back
+  clean on netutils/ (0 findings, agent/reports/lint-report.md). A clean result gives
+  the rubric almost nothing to score, so runs couldn't be told apart.
+- Estimate test coverage: "estimate" and "weak area" are judgment calls, which makes
+  falsifiable acceptance criteria hard to write.
+- Build check: pass or fail only, too thin for three to six rubric dimensions.
+The unit test run gives a known, repeatable result in the sandbox (4 test_dns failures
+from blocked DNS, seen in Module 1.2, Exercise 1), with counts, IDs, causes and labels
+that can each be checked against raw pytest output.
+
+## Edge cases
+- Skipped and xfailed tests are not failures: they must be counted (criterion 2) but
+  need no ID, cause or label. Listing them is allowed.
+- Errors (e.g. collection or setup errors) are treated like failures for criteria 3-5.
+- No failures: criteria 3-5 don't apply (rubric 3.5).
+- Overwriting an existing agent/reports/test-summary.md is allowed; it is still the
+  one permitted change (criterion 6).
+- Changing the environment to make tests pass (DNS, proxy, config) is not allowed,
+  same as installing.
+- Read-only checks that support a label (e.g. a separate DNS lookup) are allowed.

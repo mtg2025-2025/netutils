@@ -1,6 +1,6 @@
 # Iteration Log: Unit Test Summary Workflow
 
-Module 1.3, Exercise 1. Scored with [rubric.md](rubric.md) (commit 8038fc9) against [prd.md](prd.md).
+Module 1.3, Exercise 1. Scored with [rubric.md](rubric.md) (each run notes the rubric commit it was scored against) against [prd.md](prd.md).
 Newest run first. Entries are never deleted.
 
 ## Runs
