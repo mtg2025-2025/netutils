@@ -81,6 +81,19 @@ have nothing to measure. Score them **N/A** (not 1 and not 4). The run is judged
 Count Accuracy alone, and its log entry must say it is not comparable to runs that had failures. If the
 report invents a failure that pytest didn't report, score Failure Coverage 1 instead of N/A.
 
+### 3.6 Evidence Sources
+
+Score the agent's report against evidence the agent did not write, never against the report itself.
+
+| Evidence | Where it is | Used for |
+|----------|-------------|----------|
+| Raw pytest output from the run (primary) | The run's session transcript in `C:\Users\JEREMY\Projects\agent-history` (recorded by Claude Code, includes each command and its exact output) | Count Accuracy, Failure Coverage, Cause Accuracy, Failure Classification |
+| Reviewer's own rerun (cross-check) | The same pytest command, run by the reviewer in a fresh sandbox container after the agent finishes | Confirms the transcript. If counts differ, record it as an observation, not a score. |
+| Host Git state | `git status` and `git log` on Windows after the run | Gates G2 and G3 |
+
+If the transcript's pytest output is cut off (long output can be truncated), use the reviewer's rerun
+for the missing part and note that in the log.
+
 ## 4. Pass Threshold
 
 A run **passes** only if all three gates pass **and** every scored dimension scores **3 or higher**
