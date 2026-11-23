@@ -87,7 +87,7 @@ Score the agent's report against evidence the agent did not write, never against
 
 | Evidence | Where it is | Used for |
 |----------|-------------|----------|
-| Raw pytest output from the run (primary) | The run's session transcript in `C:\Users\JEREMY\Projects\agent-history` (recorded by Claude Code, includes each command and its exact output) | Count Accuracy, Failure Coverage, Cause Accuracy, Failure Classification |
+| Raw pytest output from the run (primary) | The run's session transcript in `../agent-history` (the folder next to the repo, mounted into the container) (recorded by Claude Code, includes each command and its exact output) | Count Accuracy, Failure Coverage, Cause Accuracy, Failure Classification |
 | Reviewer's own rerun (cross-check) | The same pytest command, run by the reviewer in a fresh sandbox container after the agent finishes | Confirms the transcript. If counts differ, record it as an observation, not a score. |
 | Host Git state | `git status` and `git log` on Windows after the run | Gates G2 and G3 |
 

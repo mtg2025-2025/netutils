@@ -116,8 +116,35 @@ Naming: the course is split into sections (Module 1.1, 1.2, 2.1 and so on), and 
   - Start both sessions back to back so they really run in parallel.
   - Capture `git log --oneline main..branch` before merging, because after the merge it prints nothing.
 
+## 2026-11-23: Module 1.3, Exercise 1. PRD, rubric and baseline for a single-agent workflow
+
+- **Tried:** a quality system for one agent task: run the Netutils unit tests in the sandbox and write `agent/reports/test-summary.md` explaining every failure. Files: `docs/prd.md` (375db02), `docs/rubric.md` (8038fc9, 3f400ee), `docs/iteration-log.md` (f5d1f64). Two scored runs: Run 001 baseline (539d7ac) and Run 002 with one prompt change (6e9a13d). The per-run detail (prompts, raw evidence, gates, scores, measurements) is in `docs/iteration-log.md`; this entry records the decisions.
+- **Decision: the task.** Chosen over linting (ruff, pylint and mypy were all clean in Module 1.2, Exercise 1, so there would be little to score), coverage estimation (judgment calls, hard to make falsifiable) and a build check (pass/fail only). The unit test run has a known, repeatable result in the sandbox (4 test_dns failures from blocked DNS). Recorded in the PRD's "Why this task" section (554e081).
+- **Decision: files in `docs/`, as the exercise requires,** even though `docs/` is also Netutils' documentation site. Checked: `mkdocs build --no-directory-urls --strict` (the project's own docs check in `tasks.py`) still succeeds with the three new files, run in the agent image with `--network none`.
+- **Decision: gates plus a dimension floor.** 3 binary gates (command stated, no other files changed, no commit/push/install) and 4 dimensions scored 1-4 (Count Accuracy, Failure Coverage, Cause Accuracy, Failure Classification). Pass = all gates and every dimension 3 or higher, set before Run 001. Rejected: an aggregate of 12/16 (a run with wrong counts could pass), Count Accuracy as a gate, and a "report clarity" dimension. See ADR 0003.
+- **Decision: score against evidence the agent didn't write.** The transcript's raw pytest output (primary), a reviewer rerun (cross-check), and host `git status`/`git log` (gates). Added as rubric 3.6 (3f400ee) after asking how a reviewer knows the report is accurate. See ADR 0003.
+- **Rubric fixes before any run:** an N/A rule for runs with no failures (3.5), and a level-4 example that was unreachable in the sandbox was rewritten. The principle used: the bar may change to fix a flaw, never to make the agent pass.
+- **Evidence:**
+
+  | Run | Prompt | Score | Cycle time (`time`) | Agent work | Review | Tool calls | Tokens in / out | Cost |
+  |---|---|---|---|---|---|---|---|---|
+  | 001 (e5f0edac) | v1 | 16/16 pass | 3m21.962s | ~1m22s | ~2m01s (approx.) | 19 | 506,069 / 4,357 | $0.36 |
+  | 002 (3364d95b) | v2 = v1 + exact pytest command | 16/16 pass | 1m14.369s | ~1m00s | 2m36.78s | 5 | 276,243 / 3,146 | $0.29 |
+
+  Both runs: `4 failed, 880 passed, 2 skipped, 6 xfailed` (6.64s and 5.03s), host `git status` showed only the report changed, HEAD unchanged. Cost is API-equivalent at claude-opus-5-5 rates, computed from transcript token counts.
+- **Changed:** prompt v2 gives the exact test command. Hypothesis confirmed for this pair: exploration dropped (19 to 5 tool calls, 45% fewer input tokens) with no loss in score. Cost fell less (19%) because about $0.18 per run is the cache write for Claude Code's startup context.
+- **Measurement problems, recorded rather than discarded:** Run 001's cycle time includes a late `/exit` (terminal window off-screen), so agent work time is the fairer comparison; Run 001's review timer was restarted once.
+- **Found:** in Run 002 the agent read Run 001's leftover report before running the tests. It still reran pytest, but a leftover report could let a run copy results.
+- **After the runs (554e081):** the PRD got a "Why this task" section and an "Edge cases" section (skips/xfails, errors, no failures, overwriting the report, no environment changes, read-only checks allowed). No acceptance criterion or the threshold changed. Personal Windows paths were replaced with relative ones, and `agent/tools/checkup.py` now scans the three `docs/` files (it previously missed them).
+- **Lessons:**
+  - A perfect baseline leaves the rubric no room to show improvement; the iteration then has to be judged on efficiency.
+  - Make the terminal fit the screen before timing a run.
+  - Move the previous report out of the working tree before a run.
+  - One run per prompt version can't show the normal run-to-run spread.
+
 ## Open items
 
+- Run prompt v2 of the unit test summary workflow 3 or more times to measure normal variation in tokens and time before treating Run 002 as the new baseline, and move the old report out of the working tree before each run (Module 1.3, Exercise 1 follow-up; likely part of the Module 1 lab).
 - File the 4 `netutils/vlan.py` bugs as GitHub issues and add each issue number to its xfail reason in `tests/unit/test_vlan.py` (Module 1.2, Exercise 1 follow-up).
 - The top 5 items in `agent/reports/lint-report.md` are candidate tasks for future agent sessions. The first is the `acl.py:521` empty-rules crash.
 - Turn each session's allowed command list into Claude Code permission rules (allow and deny) in the agent container, instead of relying on the prompt.

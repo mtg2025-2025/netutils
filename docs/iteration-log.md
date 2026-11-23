@@ -34,7 +34,7 @@ Not a change to the task: the terminal window was resized to fit the screen so `
 Run this project's unit tests with exactly this command: PYTHONDONTWRITEBYTECODE=1 python -m pytest tests/unit -p no:cacheprovider, and write a report to agent/reports/test-summary.md. In the report, state the exact command you ran, the counts from pytest's final summary line, every failed or errored test by its full test ID, the cause of each failure from its traceback, and whether each failure is an environment issue or a possible code defect. Do not modify any other files, and do not commit, push, or install anything.
 ```
 
-**How it was run:** Same as Run 001: Windows PowerShell from `C:\Users\JEREMY\Projects\netutils`, egress proxy up
+**How it was run:** Same as Run 001: Windows PowerShell from the repo root (`netutils`), egress proxy up
 (`docker ps`), working tree clean at `539d7ac`, fresh container from the setup.md command, then `time claude "<prompt v2>"`.
 Fresh session, no interventions. Transcript: session `3364d95b-8f1a-424f-aa85-dfdf6d834e0c` in `../agent-history`.
 Report: `agent/reports/test-summary.md` (overwrites Run 001's copy; committed with this entry). Scored against rubric
@@ -108,7 +108,7 @@ the agent not to read it. Not done here, to keep this run to one change.
 Run this project's unit tests (tests/unit) with pytest and write a report to agent/reports/test-summary.md. In the report, state the exact command you ran, the counts from pytest's final summary line, every failed or errored test by its full test ID, the cause of each failure from its traceback, and whether each failure is an environment issue or a possible code defect. Do not modify any other files, and do not commit, push, or install anything.
 ```
 
-**How it was run:** Windows PowerShell, from `C:\Users\JEREMY\Projects\netutils`, with the egress proxy running. Fresh
+**How it was run:** Windows PowerShell, from the repo root (`netutils`), with the egress proxy running. Fresh
 container started with the setup.md command (not the lesson's plain `docker run`, which would drop the egress
 boundary), then `time claude "<prompt v1>"` inside it. Fresh session, no `--continue`/`--resume`. No interventions.
 Transcript: session `e5f0edac-48e5-48d0-a6b3-51e457adc118` in `../agent-history`. Report:

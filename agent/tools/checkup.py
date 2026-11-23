@@ -20,7 +20,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 # Files and folders created for the course, as opposed to Netutils' own code.
-COURSE_PATHS = ["setup.md", "Dockerfile.agent", ".gitattributes", "agent-smoke-test.md", "agent"]
+COURSE_PATHS = ["setup.md", "Dockerfile.agent", ".gitattributes", "agent-smoke-test.md", "agent",
+                "docs/prd.md", "docs/rubric.md", "docs/iteration-log.md"]  # Module 1.3, Exercise 1
 REQUIRED_FILES = [
     "Dockerfile.agent",
     "setup.md",
@@ -182,7 +183,7 @@ def check_git_state():
         record("FAIL", "Git working tree", "not a Git repository?")
         return
     if out:
-        changed = [line[3:] for line in out.splitlines()]
+        changed = [line[2:].strip() for line in out.splitlines()]  # git() strips the first line's leading space
         record("WARN", "Everything committed", f"{len(changed)} uncommitted: " + ", ".join(changed[:6]))
     else:
         record("PASS", "Everything committed")
