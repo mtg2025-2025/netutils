@@ -192,5 +192,56 @@ parallel with Task 1's Run 004 to get true overlap and a second data point.
 
 ## Final state after merge
 
-<!-- Lab step 9: paste the output of `git log --oneline` on agent-sandbox after both branches are
-     merged, and note which commits show the two branches being merged. -->
+Both branches were reviewed (`git diff --stat agent-sandbox <branch>`: each changed only its own report and its own
+log, no shared files) and merged into `agent-sandbox` (this repo's "main") on 2026-11-24 with `git merge --no-ff`, so
+each merge has its own commit. Both merges were clean, with no conflicts.
+
+Output of `git log --oneline` on `agent-sandbox` right after the merges. The full log is 462 lines because it includes
+all of Netutils' earlier history; the first 12 lines below cover this lab and the end of Module 1.3.
+
+```
+9c8df79 (HEAD -> agent-sandbox) Merge Task 2 (all-rules lint summary, Runs 001-002) into agent-sandbox (Module 1 Lab)
+3d9fba5 Merge Task 1 (unit test summary, Runs 003-004) into agent-sandbox (Module 1 Lab)
+98de379 (lab/task2-lint-all-rules) docs: log Run 002, repeat of v1 in true parallel run (Module 1 Lab, Task 2)
+00e6f28 (lab/task1-unit-tests) docs: log Run 004, old report removed, true parallel run (Module 1 Lab, Task 1)
+2f43350 docs: log Run 001 baseline for all-rules lint (Module 1 Lab, Task 2)
+0c4198a docs: log Run 003, repeat of prompt v2 in parallel worktree (Module 1 Lab, Task 1)
+c454193 docs: add iteration log for all-rules lint (Module 1 Lab, Task 2)
+5697d12 docs: add rubric, scoring guide, and pass threshold for all-rules lint (Module 1 Lab, Task 2)
+a67249f docs: add PRD for all-rules lint summary workflow (Module 1 Lab, Task 2)
+7f83cb9 (origin/agent-sandbox) checkup: log entry, ADR 0003, remove personal paths, scan docs files (Module 1.3, Exercise 1)
+554e081 docs: add task justification and edge cases to PRD; fix log header (Module 1.3, Exercise 1)
+6e9a13d log: run 002 exact test command -- cycle time 1m14s, cost $0.29, rubric 16/16 (Module 1.3, Exercise 1)
+```
+
+The same history as a graph (`git log --oneline --graph -12`), showing the two branches leaving `c454193` and
+joining back at the merge commits:
+
+```
+*   9c8df79 (HEAD -> agent-sandbox) Merge Task 2 (all-rules lint summary, Runs 001-002) into agent-sandbox (Module 1 Lab)
+|\
+| * 98de379 (lab/task2-lint-all-rules) docs: log Run 002, repeat of v1 in true parallel run (Module 1 Lab, Task 2)
+| * 2f43350 docs: log Run 001 baseline for all-rules lint (Module 1 Lab, Task 2)
+* |   3d9fba5 Merge Task 1 (unit test summary, Runs 003-004) into agent-sandbox (Module 1 Lab)
+|\ \
+| |/
+|/|
+| * 00e6f28 (lab/task1-unit-tests) docs: log Run 004, old report removed, true parallel run (Module 1 Lab, Task 1)
+| * 0c4198a docs: log Run 003, repeat of prompt v2 in parallel worktree (Module 1 Lab, Task 1)
+|/
+* c454193 docs: add iteration log for all-rules lint (Module 1 Lab, Task 2)
+* 5697d12 docs: add rubric, scoring guide, and pass threshold for all-rules lint (Module 1 Lab, Task 2)
+* a67249f docs: add PRD for all-rules lint summary workflow (Module 1 Lab, Task 2)
+* 7f83cb9 (origin/agent-sandbox) checkup: log entry, ADR 0003, remove personal paths, scan docs files (Module 1.3, Exercise 1)
+* 554e081 docs: add task justification and edge cases to PRD; fix log header (Module 1.3, Exercise 1)
+* 6e9a13d log: run 002 exact test command -- cycle time 1m14s, cost $0.29, rubric 16/16 (Module 1.3, Exercise 1)
+```
+
+How to read it:
+- `a67249f`, `5697d12`, `c454193`: Task 2's PRD, rubric and log, committed on `agent-sandbox` before any run, so
+  the bar was set first. Both branches start from `c454193`.
+- `0c4198a`, `00e6f28`: Task 1's Runs 003 and 004 on `lab/task1-unit-tests`.
+- `2f43350`, `98de379`: Task 2's Runs 001 and 002 on `lab/task2-lint-all-rules`.
+- `3d9fba5` merges Task 1 and `9c8df79` merges Task 2. These two merge commits show the parallel branches being
+  merged back.
+- This section itself is committed after the merges, so its own commit is not in the output above.
