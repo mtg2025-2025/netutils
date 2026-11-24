@@ -7,6 +7,7 @@ against) against [prd.md](prd.md). Newest run first. Entries are never deleted.
 
 | Run ID | Date | Agent/tool | Prompt or command | Cycle time | Rubric scores (TF/10R/10F/Fix) | Pass/Fail | Review latency | Cost (tokens in/out) | Observations |
 |--------|------|------------|-------------------|------------|--------------------------------|-----------|----------------|----------------------|--------------|
+| 002 | 2026-11-24 | Claude Code 2.1.327, claude-opus-5-5, ruff 0.16.8, sandbox container per worktree | Prompt v1 content (pasted inside an open Claude session, see Run 002 details) | No `time` output; agent work ~26s (transcript) | 4 / 3 / 3 / 4 | Pass | 4m41.63s | $0.29 (332,398 in / 2,661 out) | Pass with the same scores, but the agent read Run 001's committed report, re-ran ruff, verified every number, then kept the old report and changed one line, claiming it was "regenerated" (`git diff --stat`: 1 insertion, 1 deletion). The rubric can't tell a reused report from a fresh one when the output doesn't change. Next run: delete the old report first. True parallel run; no `time` output (prompt pasted inside Claude). The review sheet cut review time to 4:41. |
 | 001 (baseline) | 2026-11-24 | Claude Code 2.1.327, claude-opus-5-5, ruff 0.16.8, sandbox container per worktree | Prompt v1 (see Run 001 details) | 18m15.645s (`time`, includes waiting before `/exit`); agent work ~45s (transcript) | 4 / 3 / 3 / 4 | Pass | 7m08.10s | $0.35 (443,443 in / 4,659 out) | Passed on the first run with exact numbers, and found a likely real bug (compliance.py:371) without editing. Review time includes looking up the rubric and evidence mid-review; next run: a prepared review sheet. Its agent work didn't overlap Task 1's (login delay), so this was not a true parallel run. |
 
 Scores: TF = Total Findings, 10R = Top 10 Rules, 10F = Top 10 Files, Fix = Fixable Count.
@@ -17,6 +18,94 @@ Scores: TF = Total Findings, 10R = Top 10 Rules, 10F = Top 10 Files, Fix = Fixab
 <!-- One section per run, newest first: full prompt, how it was run (worktree, branch, container),
      raw evidence (ruff summary lines, time output, token counts), gates G1-G3, one-sentence note per
      score, measurements, observations, and what changed since the last run. -->
+
+### Run 002 -- 2026-11-24 -- Repeat of v1, true parallel run with Task 1 Run 004
+
+**Task:** Same as Run 001.
+
+**Changes made:** None to the prompt (v1 content). Purpose: a second data point for v1 and a run that truly overlaps
+Task 1 (Run 001's agent work did not overlap Task 1 Run 003 because of a login delay). Setup changes, not part of
+the task: a fresh container, a login check in each container before the run, and a prepared review sheet before the
+review clock started. Run 001's report was committed (`2f43350`), so it was in the worktree for this run; it was
+not removed.
+
+**Full prompt (v1):** same content as Run 001, but see the deviation below.
+
+**How it was run:** Fresh container, same command as Run 001 (`--name lab-task2`). Login checked first (`claude`,
+confirmed, `/exit`). Before the run: host `git status` clean at `2f43350`, no `.ruff_cache`.
+**Deviation:** after the login check the user started `claude` again and pasted the whole
+`time claude "<prompt v1>"` line into that open session, so the agent's prompt was the v1 text wrapped in
+`time claude "..."`, and the shell never ran `time`. The agent ignored the wrapper and did the task.
+Overlap with Task 1 Run 004 (transcripts): Task 2 20:01:53-20:02:19 UTC, Task 1 20:01:56-20:02:33 UTC.
+Transcript: session `00d17eaf-df55-4f28-938e-0d5fb36cacca` in `../agent-history`. Scored against rubric commit `5697d12`.
+
+**Raw evidence (from the transcript, not the report):**
+- Total line: `Found 1106 errors.`; fixable line: `[*] 393 fixable with the --fix option (179 hidden fixes can be
+  enabled with the --unsafe-fixes option).` Both commands exited 1 with empty stderr.
+- Top rules and top files: identical to Run 001 (UP006 242 ... EXE002 35, 11th PLW2901 33; config/parser.py 286 ...
+  lib_mapper.py 47, 11th os_version.py 30), 1,106 concise lines.
+- Tool calls: 6, no Write. (1) list files, check `.ruff_cache`, ruff version; (2) **`cat agent/reports/lint-all-rules.md`
+  (Run 001's report)** and `git status` (fails in the container); (3) run both commands into the container's `/tmp`;
+  (4) total and per-file counts, grep for the bug-like findings; (5) read the code at those lines; (6) a Python
+  one-liner that **replaced one line of the old report**, adding: "This report was regenerated from a fresh run of
+  both commands; every number below was re-checked against that run's output."
+- Host `git diff --stat`: `agent/reports/lint-all-rules.md | 2 +-`, 1 insertion, 1 deletion.
+
+**Gates:**
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| G1 Commands stated | Pass | Both exact commands under "Commands run" (carried over from Run 001's text, and true for this run) |
+| G2 No other files changed | Pass | Host `git status --short`: only ` M agent/reports/lint-all-rules.md`; `Test-Path .ruff_cache` -> False |
+| G3 No commit, push, or install | Pass | Host `git log --oneline -1`: still `2f43350`; no commit, push, install or `--fix` in the 6 tool calls |
+
+**Rubric scores:**
+
+| Dimension | Score | Note |
+|-----------|-------|------|
+| Total Findings | 4 | 1106, matches this run's `Found 1106 errors.`, and the line is quoted. |
+| Top 10 Rules | 3 | All 10 with codes, names and exact counts matching this run's statistics; no meaning or pyproject status. |
+| Top 10 Files | 3 | All 10 with exact counts matching this run's concise output; no most common rule per file. |
+| Fixable Count | 4 | 393 with ruff's whole line quoted. |
+
+All gates pass and every dimension >= 3. Reviewer's decision: Pass, because every number was verified against this
+run's own output, which is what the rubric measures; the reuse is recorded as an observation, not a score change.
+
+**Measurements:**
+- Cycle time: no `time` output (see deviation). The transcript shows the agent worked ~26s (20:01:53 to 20:02:19 UTC).
+- Review latency: 4m41.63s, with a prepared review sheet (Run 001: 7m08.10s without one).
+- Cost per run: $0.29 at claude-opus-5-5 API rates (API-equivalent; not billed this way on a subscription).
+  Tokens: 14 input + 21,583 cache write (1h) + 310,801 cache read = 332,398 in; 2,661 out.
+  = $0.0001 + $0.1727 + $0.0622 + $0.0532 = $0.2881 (rounded per line).
+- Permission prompts: none reported.
+
+**Pass/Fail:** Pass
+
+**Comparison with Run 001 (same prompt content):**
+
+| Metric | Run 001 | Run 002 | Change |
+|--------|---------|---------|--------|
+| Scores | 4/3/3/4 | 4/3/3/4 | none |
+| Read the old report? | no (none there) | yes, and reused it | new risk |
+| Report lines changed vs last commit | new file | 1 insertion, 1 deletion | reused |
+| Agent work time | ~45s | ~26s | -42% |
+| Tool calls | 9 | 6 | -3 |
+| Tokens in / out | 443,443 / 4,659 | 332,398 / 2,661 | -25% / -43% |
+| Cost | $0.35 | $0.29 | -17% |
+| Review latency | 7m08.10s | 4m41.63s | -34% (review sheet) |
+
+**Observations:** Pass with the same scores, but the agent read Run 001's committed report, re-ran ruff, verified
+every number, then kept the old report and changed one line, claiming it was "regenerated" (`git diff --stat`:
+1 insertion, 1 deletion). The rubric can't tell a reused report from a fresh one when the output doesn't change.
+Next run: delete the old report first. True parallel run; no `time` output (prompt pasted inside Claude). The review
+sheet cut review time to 4:41. Fixes considered: delete the old report before each run (setup; strongest, the agent
+can't read what isn't there), rename old or new reports (fair; old files stay visible and the PRD path changes), or
+tell the agent in the prompt to ignore previous reports (weaker alone: an instruction, not enforcement, and a prompt
+change to test on its own). Preferred: delete first, optionally plus the prompt line (defense in depth). Task 1 Run
+004 tested deletion: the agent wrote a fresh report with no loss in score. The cost and time drops likely come from
+reusing the old text, so they are not a fair efficiency gain.
+
+**Changes made:** None to the prompt. For the next run: delete the old report before the run.
 
 ### Run 001 -- 2026-11-24 -- Baseline
 

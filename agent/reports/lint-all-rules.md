@@ -1,6 +1,6 @@
 # Ruff lint report: all rules (`--select ALL`)
 
-Ruff version: 0.16.8 (`/usr/local/bin/ruff`). Run from `/workspace` on 2026-11-24.
+Ruff version: 0.16.8 (`/usr/local/bin/ruff`). Run from `/workspace` on 2026-11-24. This report was regenerated from a fresh run of both commands; every number below was re-checked against that run's output.
 
 ## Commands run
 
