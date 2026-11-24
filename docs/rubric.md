@@ -60,10 +60,10 @@ sandbox cannot resolve domain names.
 
 | Level | Description | Example case |
 |-------|-------------|--------------|
-| 1 | No cause given, or the cause contradicts the traceback. | "The DNS functions have a bug." The traceback shows a name-resolution error, not wrong output. |
+| 1 | No cause given, or the cause contradicts the traceback. | "The DNS functions have a bug." The tracebacks show a failed DNS lookup (an assertion on a `False` result, and `socket.gaierror`), not a logic error in the library. |
 | 2 | Cause is in the right area but vague or unsupported by the traceback. | "They failed because of a network problem." |
-| 3 | Each failure's cause names the actual error from its traceback. | "Each fails with socket.gaierror: Temporary failure in name resolution." |
-| 4 | Specific, correct cause, plus the line or call where it happened. | "socket.gaierror (Temporary failure in name resolution), raised inside dns.fqdn_to_ip calling socket.gethostbyname." |
+| 3 | Each failure's cause names the actual error from its traceback. | "test_is_fqdn_resolvable[data0] and [data1] fail with AssertionError: assert False == True (the lookup failed, so the function returned False); test_fqdn_to_ip[data0] and [data1] fail with socket.gaierror: Temporary failure in name resolution." |
+| 4 | Specific, correct cause, plus the line or call where it happened. | "socket.gaierror (Temporary failure in name resolution), raised by socket.getaddrinfo at netutils/dns.py:29 inside dns.fqdn_to_ip; in test_is_fqdn_resolvable, dns.py catches the same error and returns False, so the assertion at tests/unit/test_dns.py:23 fails." |
 
 ### 3.4 Failure Classification
 
@@ -71,7 +71,7 @@ sandbox cannot resolve domain names.
 |-------|-------------|--------------|
 | 1 | A failure is mislabeled, or no labels are given. | DNS failures labeled "possible code defect" and the agent proposes changing dns.py. |
 | 2 | Labels are correct but no reason is given. | "All 4 are environment issues." |
-| 3 | Every label is correct and backed by evidence from the run. | "Environment: the sandbox blocks outbound DNS (egress allowlist), and the error is name resolution, not an assertion." |
+| 3 | Every label is correct and backed by evidence from the run. | "Environment: a separate socket.getaddrinfo('google.com', 0) outside pytest fails with the same name-resolution error, and the DNS tests that expect a failed lookup pass, so the sandbox can't resolve public names and the code behaves as documented." |
 | 4 | Correct, justified labels, plus how to confirm the label. | "...These should pass outside the sandbox. To confirm, run `pytest tests/unit/test_dns.py` on a machine with normal DNS." |
 
 ### 3.5 Runs With No Failures
@@ -104,6 +104,12 @@ missing failure makes the report wrong, however well the rest is written, so a h
 dimension must not hide a low score on another. A dimension floor prevents that.
 
 Set on 2026-11-23, before Run 001.
+
+Example corrections, 2026-11-24 (after grader feedback on Module 1.3, Exercise 1): four example cases in 3.3
+(levels 1, 3, 4) and 3.4 (level 3) were written before any run and didn't match the recorded tracebacks. Two of
+the four failures are `AssertionError: assert False == True`, not `socket.gaierror`, and the DNS call is
+`socket.getaddrinfo`, not `socket.gethostbyname`. The examples now match the evidence. No level description,
+gate or threshold changed, so no past score changes; Runs 001-004 were scored against commit `3f400ee`.
 
 ## 5. Alternatives Considered
 

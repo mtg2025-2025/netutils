@@ -15,6 +15,12 @@ Newest run first. Entries are never deleted.
 Scores: CA = Count Accuracy, FC = Failure Coverage, Cause = Cause Accuracy,
 Class = Failure Classification. 1-4, or N/A (rubric 3.5). Pass = all gates + every scored dimension >= 3.
 
+Rubric change after Run 004 (2026-11-24): grader feedback on Module 1.3, Exercise 1 (11/12) found that two example
+cases in the rubric contradicted the recorded tracebacks; two more of the same kind were found while fixing them.
+The examples in 3.3 and 3.4 were corrected to match the evidence (two failures are `AssertionError`, two are
+`socket.gaierror`; the call is `socket.getaddrinfo`). Level descriptions, gates and the threshold are unchanged, so
+Runs 001-004 keep their scores (all scored against `3f400ee`). Lesson: write rubric examples from real output.
+
 ## Run details
 
 <!-- One section per run, newest first: full prompt, gates G1-G3, one-sentence note per score,
