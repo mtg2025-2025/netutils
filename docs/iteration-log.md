@@ -7,6 +7,7 @@ Newest run first. Entries are never deleted.
 
 | Run ID | Date | Agent/tool | Prompt or command | Cycle time | Rubric scores (CA/FC/Cause/Class) | Pass/Fail | Review latency | Cost (tokens in/out) | Observations |
 |--------|------|------------|-------------------|------------|-----------------------------------|-----------|----------------|----------------------|--------------|
+| 003 | 2026-11-24 | Claude Code 2.1.327, claude-opus-5-5, sandbox container per worktree (Module 1 Lab) | Prompt v2, unchanged (repeat of Run 002) | 18m58.962s (`time`, includes ~16 min login block); agent work ~49s (transcript) | 4 / 4 / 4 / 4 = 16/16 | Pass | 8m10.98s | $0.27 (237,853 in / 2,928 out) | Login expired at the start (shared login volume suspected, not verified) and blocked the run about 16 min; the agent itself worked about 49s, so `real` time isn't comparable. Review time includes looking up the rubric and evidence mid-review. Next run: confirm Claude Code login in each container and prepare a review sheet before starting the clock. The agent read the old report again but reported fresh numbers (8.65s). |
 | 002 | 2026-11-23 | Claude Code 2.1.327, claude-opus-5-5, sandbox container (setup.md command) | Prompt v2 = v1 + exact pytest command (see Run 002 details) | 1m14.369s (`time`); agent work ~1m00s (transcript) | 4 / 4 / 4 / 4 = 16/16 | Pass | 2m36.78s | $0.29 (276,243 in / 3,146 out) | Same score with 45% fewer input tokens and 5 tool calls instead of 19. The agent read Run 001's leftover report before running the tests. |
 | 001 (baseline) | 2026-11-23 | Claude Code 2.1.327, claude-opus-5-5, sandbox container (setup.md command) | Prompt v1 (see Run 001 details) | 3m21.962s (`time`); agent work ~1m22s (transcript) | 4 / 4 / 4 / 4 = 16/16 | Pass | ~2m01s (approximate) | $0.36 (506,069 in / 4,357 out) | Perfect score: the rubric may leave no room to show improvement. Cost is high for one test run because the agent explored first. |
 
@@ -17,6 +18,94 @@ Class = Failure Classification. 1-4, or N/A (rubric 3.5). Pass = all gates + eve
 
 <!-- One section per run, newest first: full prompt, gates G1-G3, one-sentence note per score,
      raw evidence (pytest summary line, time output, token counts), and what changed since the last run. -->
+
+### Run 003 -- 2026-11-24 -- Repeat of Run 002, run in parallel with Task 2 (Module 1 Lab)
+
+**Task:** Same as Run 001.
+
+**Changes made:** None to the prompt (v2, word for word). Purpose: a 1:1 repeat of Run 002 to see whether v2's
+results hold. Setup differences, not prompt changes: the run used its own worktree (`..\netutils-task1`, branch
+`lab/task1-unit-tests`, created from `c454193`) and its own container (`--name lab-task1`), started at the same time
+as Task 2's Run 001 in a second container. The old Run 002 report was left in place on purpose (removing it is the
+one change planned for Run 004).
+
+**Full prompt (v2):** identical to Run 002 above.
+
+**How it was run:** From the Task 1 worktree folder (`netutils-task1`, next to `netutils`) in Windows PowerShell, egress proxy up (`docker ps`;
+its running allowlist and config were compared with the repo's copies: identical). Container: the setup.md command
+plus `--name lab-task1`, mounting this worktree as `/workspace`. Then `time claude "<prompt v2>"`.
+Isolation evidence (inside the container): `cat .git` -> `gitdir: <Windows path>/netutils/.git/worktrees/netutils-task1`;
+`ls /workspace/..` shows no other worktree. From the host, `docker inspect` showed only this worktree at `/workspace`
+(plus the shared `claude-auth` volume and `agent-history` folder). Git can't run inside the container (the worktree's
+gitdir is a Windows path), so `git status` there fails; gates were checked from the host.
+Transcript: session `b7159bd5-47ec-482f-9639-302641f1e356` in `../agent-history`. Scored against rubric commit `3f400ee`.
+
+**Intervention:** at 18:11:20 UTC the session replied "Login expired · Please run /login". The user ran `/login`;
+the login page failed twice in the DuckDuckGo browser, then worked in Microsoft Edge. The session continued the
+original prompt by itself at 18:27:29 (no prompt re-sent, no other input). Suspected cause, not verified: both
+containers share the `claude-auth` login volume and started within 2 seconds of each other; Task 2's session logged
+in normally.
+
+**Raw evidence (from the transcript, not the report):**
+- pytest summary line: `4 failed, 880 passed, 2 skipped, 6 xfailed in 8.65s`, exit code 1. The old report said
+  5.03s, so this is a fresh run, not copied numbers.
+- Failed: `tests/unit/test_dns.py::test_is_fqdn_resolvable[data0]`, `[data1]`, `tests/unit/test_dns.py::test_fqdn_to_ip[data0]`, `[data1]`
+- Errors in the tracebacks: `AssertionError: assert False == True` (test_is_fqdn_resolvable, google.com / yahoo.com)
+  and `socket.gaierror: [Errno -3] Temporary failure in name resolution` (test_fqdn_to_ip, `socket.py:978`)
+- Tool calls: 4 (list files and run pytest; read the old report and `netutils/dns.py`, rerun pytest with `-rsx -q`
+  for skip/xfail reasons, a separate DNS lookup, `/etc/resolv.conf`; versions and `pyproject.toml` addopts; write
+  the report)
+
+**Gates:**
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| G1 Command stated | Pass | Report states `PYTHONDONTWRITEBYTECODE=1 python -m pytest tests/unit -p no:cacheprovider` |
+| G2 No other files changed | Pass | Host `git status --short` after the run: only ` M agent/reports/test-summary.md`; no `.pytest_cache` |
+| G3 No commit, push, or install | Pass | Host `git log --oneline -1`: still `c454193`; none of the 4 tool calls is an install, commit or push |
+
+**Rubric scores:**
+
+| Dimension | Score | Note |
+|-----------|-------|------|
+| Count Accuracy | 4 | Every count matches the raw summary line, and the report quotes that line (8.65s). The reviewer first scored 3, reading level 4 as needing a numeric exit code; level 4 says summary line *or* exit code, so corrected to 4 on re-reading. |
+| Failure Coverage | 4 | The same 4 full test IDs as the raw output, none missing or invented, with data0/data1 mapped to google.com/yahoo.com. |
+| Cause Accuracy | 4 | Each failure has its actual error with where it happened (`test_dns.py:23`; `dns.py:29` -> `socket.py:978`). |
+| Failure Classification | 4 | All 4 labeled environment, backed by a separate lookup that failed the same way, the resolver address and the passing negative tests; says they should pass with working DNS. |
+| **Total** | **16/16** | Pass threshold: all gates pass and every dimension >= 3 |
+
+**Measurements:**
+- Cycle time: 18m58.962s (`real` from `time`; user 0m12.918s, sys 0m3.193s). Not comparable with earlier runs: about
+  16 minutes were the login block. The transcript shows the agent worked ~49s (18:27:29 to 18:28:18 UTC).
+- Review latency: 8m10.98s. Includes looking up the rubric and evidence during review and running the gate commands
+  in the wrong window once (inside the container, where Git can't run).
+- Cost per run: $0.27 at claude-opus-5-5 API rates (API-equivalent; not billed this way on a subscription).
+  Tokens: 10 input + 20,473 cache write (1h) + 217,370 cache read = 237,853 in; 2,928 out.
+  = $0.0000 + $0.1638 + $0.0435 + $0.0586 = $0.2659.
+- Permission prompts: none reported.
+
+**Pass/Fail:** Pass
+
+**Comparison with Run 002 (same prompt):**
+
+| Metric | Run 002 | Run 003 | Change |
+|--------|---------|---------|--------|
+| Rubric | 16/16 | 16/16 | none |
+| Agent work time | ~1m00s | ~49s | about -18% |
+| Tool calls | 5 | 4 | -1 |
+| Tokens in | 276,243 | 237,853 | -14% |
+| Tokens out | 3,146 | 2,928 | -7% |
+| Cost | $0.29 | $0.27 | -8% |
+| pytest time | 5.03s | 8.65s | slower, cause unknown (Task 2's agent had already finished, so not shared load) |
+
+**Observations:** Login expired at the start (shared login volume suspected, not verified) and blocked the run about
+16 min; the agent itself worked about 49s, so `real` time isn't comparable. Review time includes looking up the rubric
+and evidence mid-review. Next run: confirm Claude Code login in each container and prepare a review sheet before
+starting the clock. The agent read the old report again but reported fresh numbers (8.65s). Its results matched Run
+002 exactly with similar cost, which supports v2 being stable, though two runs are still a small sample. It also
+added a skip/xfail section and a second read-only pytest run that the prompt didn't ask for; harmless, but out of
+scope and not rewarded by the rubric. Because of the login delay, its agent work did not overlap Task 2's
+(18:11-18:12 vs 18:27-18:28), so this was not a true parallel run; Run 004 is to be run alongside Task 2's Run 002.
 
 ### Run 002 -- 2026-11-23 -- One change: exact test command in the prompt
 
