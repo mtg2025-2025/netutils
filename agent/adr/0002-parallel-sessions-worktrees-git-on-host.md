@@ -39,4 +39,19 @@ Two questions came up while setting this up:
   - The agents can't use Git history (`git log`, `git blame`) while they work.
   - The orchestrator has to commit each session's work by hand.
   - `git diff` doesn't show a session's new untracked files until they're staged (`git add -N`) or committed.
-- **Not covered by this decision:** the per-session command lists are only requested in the prompt, not enforced. In Module 1.2, Exercise 1, both agents ran read-only shell tools outside their lists. Enforcing the lists with Claude Code permission rules in the container is an open item in the iteration log.
+- **Not covered by this decision (2026-11-20):** the per-session command lists are only requested in the prompt, not enforced. In Module 1.2, Exercise 1, both agents ran read-only shell tools outside their lists. Enforcing the lists with Claude Code permission rules in the container is an open item in the iteration log.
+
+## Update 2026-11-24 (Module 1 Lab)
+
+Used again for two measured workflows run in parallel (`../netutils-task1`, `../netutils-task2`). Additions:
+
+- **Name each container** (`--name lab-task1`, `--name lab-task2`) so its mounts can be checked from the host with
+  `docker inspect`. Isolation is verified from both sides before a run: inside (`cat .git`, `ls /workspace/..`) and
+  outside (`docker inspect`).
+- **Each task keeps its documents and report in its own files** (Task 2 in `docs/lint-all-rules/`), so branches
+  share no file and merge without conflicts. Merges use `--no-ff` so each branch's merge is visible in `git log`.
+- **Before each run:** delete the previous run's report from the worktree (an agent read and, once, reused a
+  leftover report), and check the Claude Code login in each container one at a time (the shared `claude-auth`
+  volume is the suspected cause of an expired login that blocked one run for ~16 minutes; not verified).
+- Alternative considered for the login problem: a separate login volume per container. Not adopted yet: it needs a
+  second login and hasn't been shown to be necessary; the pre-run check prevented a repeat.

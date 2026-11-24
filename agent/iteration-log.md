@@ -142,9 +142,60 @@ Naming: the course is split into sections (Module 1.1, 1.2, 2.1 and so on), and 
   - Move the previous report out of the working tree before a run.
   - One run per prompt version can't show the normal run-to-run spread.
 
+## 2026-11-24: Module 1 Lab. Two measured workflows in parallel worktrees, merged
+
+- **Tried:** Task 1 (unit test summary, from Module 1.3) and Task 2 (new: all-rules lint summary) run in parallel,
+  each in its own worktree (`../netutils-task1` on `lab/task1-unit-tests`, `../netutils-task2` on
+  `lab/task2-lint-all-rules`, both from `c454193`) and its own sandbox container (setup.md command plus
+  `--name lab-task1/2`). Task 2's PRD (a67249f), rubric (5697d12) and log (c454193) were committed before any run,
+  in `docs/lint-all-rules/`. Per-run detail is in `docs/iteration-log.md` (Task 1) and
+  `docs/lint-all-rules/iteration-log.md` (Task 2); this entry records the decisions.
+- **Decision: Task 2 = ruff with every rule enabled** (`--select ALL --no-cache`, `--statistics` and
+  `--output-format concise`). Rejected: normal lint and mypy (0 findings), `mypy --strict` (2 errors, too few to
+  rank). All-rules had 1,106 findings over ~84 rules, all checkable against ruff's own output. `--no-cache` because
+  ruff hides `.ruff_cache` from `git status`. Never `--fix`.
+- **Decision: each task's documents in their own folder** (`docs/lint-all-rules/`), so the two branches touch no
+  shared file. Both merges were clean.
+- **Decision: merge with `--no-ff`** so each branch's merge has its own commit in `git log` (3d9fba5, 9c8df79).
+- **Isolation evidence:** inside each container `cat .git` (its own worktree) and `ls /workspace/..` (no other
+  worktree); from the host `docker inspect lab-task1 lab-task2` (each mounts only its own worktree). Shared by both:
+  `claude-auth` and `agent-history`. See ADR 0002 (updated).
+- **Evidence:**
+
+  | Task / run | Session | Score | Agent work | Review | Tokens in / out | Cost | Notes |
+  |---|---|---|---|---|---|---|---|
+  | 1 / 003 | b7159bd5 | 16/16 pass | ~49s | 8m10.98s | 237,853 / 2,928 | $0.27 | login expired, ~16 min blocked; read old report, fresh numbers |
+  | 2 / 001 | b5e2e452 | 4/3/3/4 pass | ~45s | 7m08.10s | 443,443 / 4,659 | $0.35 | found bare `raise` bug, compliance.py:371 |
+  | 1 / 004 | e70fa69d | 16/16 pass | ~37s | 2m19.00s | 293,951 / 3,379 | $0.31 | old report deleted first; fresh report |
+  | 2 / 002 | 00d17eaf | 4/3/3/4 pass | ~26s | 4m41.63s | 332,398 / 2,661 | $0.29 | reused Run 001's report, changed 1 line |
+
+  Round 1 did not overlap (login delay); round 2 did (20:01:53-20:02:33 UTC). Round 2 prompts were pasted inside an
+  open Claude session, so no `time` output; working time is from the transcripts. Reviews in round 2 used a
+  prepared review sheet.
+- **Found:**
+  - A shared login volume may expire or refresh under two sessions starting together (suspected, not verified).
+    A login check in each container before a timed run prevented a repeat.
+  - Leftover reports are inputs. Task 2 Run 002 read Run 001's committed report and changed one line while
+    claiming it was "regenerated"; scores were unchanged because ruff's output is deterministic, so the rubric
+    can't tell reuse from a fresh report. `git diff --stat` and the transcript showed it. Deleting the old report
+    first (Task 1 Run 004) gave a fresh report with no loss in score.
+  - Review is the bottleneck: agents ~26-49 s, reviews 2-8 min. A one-page review sheet cut review time 34-72%.
+  - The reviewer first scored Task 1 Run 003's Count Accuracy 3 (read "summary line or exit code" as "and"),
+    corrected to 4 on re-reading; recorded in the run's log.
+  - Prompts passed on the command line can't contain backticks or double quotes (shell substitution/quoting).
+- **Lessons:**
+  - Delete previous outputs before each run.
+  - Check the login in each container, one at a time, before starting timed runs.
+  - Type `time claude "<prompt>"` at the container shell, not inside Claude.
+  - Prepare the review sheet before starting the review clock.
+  - Re-check every line of a reused prompt against the new task's PRD.
+
 ## Open items
 
-- Run prompt v2 of the unit test summary workflow 3 or more times to measure normal variation in tokens and time before treating Run 002 as the new baseline, and move the old report out of the working tree before each run (Module 1.3, Exercise 1 follow-up; likely part of the Module 1 lab).
+- For Task 2 (all-rules lint), delete `agent/reports/lint-all-rules.md` before each run, and consider adding "write a new report; don't read earlier reports" to the prompt as a separately tested change (Module 1 Lab follow-up).
+- Investigate whether the shared `claude-auth` volume causes the expired login when two containers start Claude together (Module 1 Lab follow-up).
+- Task 1's rubric is saturated (4 runs, all 16/16); harder criteria would be needed to show quality gains (Module 1 Lab follow-up).
+- `netutils/config/compliance.py:371`: bare `raise` outside an `except` block (found by Task 2 Run 001); candidate for a GitHub issue or a future agent task (Module 1 Lab follow-up).
 - File the 4 `netutils/vlan.py` bugs as GitHub issues and add each issue number to its xfail reason in `tests/unit/test_vlan.py` (Module 1.2, Exercise 1 follow-up).
 - The top 5 items in `agent/reports/lint-report.md` are candidate tasks for future agent sessions. The first is the `acl.py:521` empty-rules crash.
 - Turn each session's allowed command list into Claude Code permission rules (allow and deny) in the agent container, instead of relying on the prompt.

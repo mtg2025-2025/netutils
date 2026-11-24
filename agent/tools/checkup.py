@@ -21,7 +21,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 # Files and folders created for the course, as opposed to Netutils' own code.
 COURSE_PATHS = ["setup.md", "Dockerfile.agent", ".gitattributes", "agent-smoke-test.md", "agent",
-                "docs/prd.md", "docs/rubric.md", "docs/iteration-log.md"]  # Module 1.3, Exercise 1
+                "docs/prd.md", "docs/rubric.md", "docs/iteration-log.md",  # Module 1.3, Exercise 1
+                "docs/lint-all-rules/prd.md", "docs/lint-all-rules/rubric.md",
+                "docs/lint-all-rules/iteration-log.md"]  # Module 1 Lab
 REQUIRED_FILES = [
     "Dockerfile.agent",
     "setup.md",
