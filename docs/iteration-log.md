@@ -7,6 +7,7 @@ Newest run first. Entries are never deleted.
 
 | Run ID | Date | Agent/tool | Prompt or command | Cycle time | Rubric scores (CA/FC/Cause/Class) | Pass/Fail | Review latency | Cost (tokens in/out) | Observations |
 |--------|------|------------|-------------------|------------|-----------------------------------|-----------|----------------|----------------------|--------------|
+| 004 | 2026-11-24 | Claude Code 2.1.327, claude-opus-5-5, sandbox container per worktree (Module 1 Lab) | Prompt v2 content (pasted inside an open Claude session, see Run 004 details); old report deleted before the run | No `time` output; agent work ~37s (transcript) | 4 / 4 / 4 / 4 = 16/16 | Pass | 2m19.00s | $0.31 (293,951 in / 3,379 out) | One change from Run 003: the old report was deleted before the run. The agent wrote a fresh report (`git diff --stat`: 36 insertions, 29 deletions) and still scored 16/16, so deleting it didn't hurt quality. True parallel run with Task 2 Run 002. The prompt was pasted inside an already-open Claude session, so there is no `time` output; working time from the transcript. The review sheet cut review time to 2:19. |
 | 003 | 2026-11-24 | Claude Code 2.1.327, claude-opus-5-5, sandbox container per worktree (Module 1 Lab) | Prompt v2, unchanged (repeat of Run 002) | 18m58.962s (`time`, includes ~16 min login block); agent work ~49s (transcript) | 4 / 4 / 4 / 4 = 16/16 | Pass | 8m10.98s | $0.27 (237,853 in / 2,928 out) | Login expired at the start (shared login volume suspected, not verified) and blocked the run about 16 min; the agent itself worked about 49s, so `real` time isn't comparable. Review time includes looking up the rubric and evidence mid-review. Next run: confirm Claude Code login in each container and prepare a review sheet before starting the clock. The agent read the old report again but reported fresh numbers (8.65s). |
 | 002 | 2026-11-23 | Claude Code 2.1.327, claude-opus-5-5, sandbox container (setup.md command) | Prompt v2 = v1 + exact pytest command (see Run 002 details) | 1m14.369s (`time`); agent work ~1m00s (transcript) | 4 / 4 / 4 / 4 = 16/16 | Pass | 2m36.78s | $0.29 (276,243 in / 3,146 out) | Same score with 45% fewer input tokens and 5 tool calls instead of 19. The agent read Run 001's leftover report before running the tests. |
 | 001 (baseline) | 2026-11-23 | Claude Code 2.1.327, claude-opus-5-5, sandbox container (setup.md command) | Prompt v1 (see Run 001 details) | 3m21.962s (`time`); agent work ~1m22s (transcript) | 4 / 4 / 4 / 4 = 16/16 | Pass | ~2m01s (approximate) | $0.36 (506,069 in / 4,357 out) | Perfect score: the rubric may leave no room to show improvement. Cost is high for one test run because the agent explored first. |
@@ -18,6 +19,88 @@ Class = Failure Classification. 1-4, or N/A (rubric 3.5). Pass = all gates + eve
 
 <!-- One section per run, newest first: full prompt, gates G1-G3, one-sentence note per score,
      raw evidence (pytest summary line, time output, token counts), and what changed since the last run. -->
+
+### Run 004 -- 2026-11-24 -- One change: old report deleted before the run; true parallel run with Task 2
+
+**Task:** Same as Run 001.
+
+**Changes made:** One change: `agent/reports/test-summary.md` (Run 003's committed report) was deleted from the
+worktree before the run (`Remove-Item`, not committed; host `git status` showed ` D agent/reports/test-summary.md`).
+Reason: Runs 002 and 003 read the leftover report before running the tests. Hypothesis: with no old report, the
+agent writes the report from this run alone, with no loss in score. Setup also changed (not part of the test): a
+login check in each container before the run (Run 003 lost ~16 min to an expired login), and a prepared review
+sheet (rubric levels + raw evidence + gate commands on one page) before the review clock started.
+
+**Full prompt (v2):** same content as Run 002, but see the deviation below.
+
+**How it was run:** Fresh containers for both tasks (the Run 003 containers were exited; `--rm` deleted them), same
+command as Run 003 (`--name lab-task1`). Login checked first: `claude`, confirmed logged in, `/exit`, one container at
+a time. Then the two runs were started within ~3 seconds of each other.
+**Deviation:** after the login check the user started `claude` again and pasted the whole
+`time claude "<prompt v2>"` line into that open session. So the agent's prompt was the v2 text wrapped in
+`time claude "..."`, and the shell never ran `time` (no real/user/sys output). The agent ignored the wrapper and did
+the task. The login check also left two tiny extra sessions in `../agent-history` (b88b8559, ed5bc4c7), not runs.
+Overlap with Task 2 Run 002 (transcripts): Task 1 20:01:56-20:02:33 UTC, Task 2 20:01:53-20:02:19 UTC.
+Transcript: session `e70fa69d-ca62-40d3-ae3a-b39bdd8b414d` in `../agent-history`. Scored against rubric commit `3f400ee`.
+
+**Raw evidence (from the transcript, not the report):**
+- pytest summary line: `4 failed, 880 passed, 2 skipped, 6 xfailed in 5.49s`, exit code 1
+- Failed: `tests/unit/test_dns.py::test_is_fqdn_resolvable[data0]`, `[data1]`, `tests/unit/test_dns.py::test_fqdn_to_ip[data0]`, `[data1]`
+- Errors in the tracebacks: `AssertionError: assert False == True` (test_is_fqdn_resolvable) and
+  `socket.gaierror: [Errno -3] Temporary failure in name resolution` (test_fqdn_to_ip)
+- Tool calls: 5 (list files and try `git status`, which fails in the container; run pytest saving output to the
+  container's `/tmp`; read the saved output and `netutils/dns.py`; a separate DNS lookup (localhost works,
+  google.com fails), `/etc/resolv.conf`, the napalm test file; write the report). It listed `agent/reports` first and
+  found no old report to read.
+
+**Gates:**
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| G1 Command stated | Pass | Report states `PYTHONDONTWRITEBYTECODE=1 python -m pytest tests/unit -p no:cacheprovider` |
+| G2 No other files changed | Pass | Host `git status --short`: only ` M agent/reports/test-summary.md` (M, not D, so a new report was written); no `.pytest_cache` |
+| G3 No commit, push, or install | Pass | Host `git log --oneline -1`: still `0c4198a`; none of the 5 tool calls is an install, commit or push |
+
+**Rubric scores:**
+
+| Dimension | Score | Note |
+|-----------|-------|------|
+| Count Accuracy | 4 | Every count matches, and the report quotes the summary line (5.49s, this run's). |
+| Failure Coverage | 4 | The same 4 full test IDs, none missing or invented, with data0/data1 mapped to google.com/yahoo.com. |
+| Cause Accuracy | 4 | Each failure has its actual error and where it happened (`netutils/dns.py:29`, `socket.getaddrinfo`). |
+| Failure Classification | 4 | All 4 labeled environment, backed by the separate lookup (localhost resolves, google.com doesn't) and the resolver address; says they should pass where DNS works. |
+| **Total** | **16/16** | Pass threshold: all gates pass and every dimension >= 3 |
+
+**Measurements:**
+- Cycle time: no `time` output (see deviation). The transcript shows the agent worked ~37s (20:01:56 to 20:02:33 UTC).
+- Review latency: 2m19.00s, with a prepared review sheet (Run 003: 8m10.98s without one).
+- Cost per run: $0.31 at claude-opus-5-5 API rates (API-equivalent; not billed this way on a subscription).
+  Tokens: 12 input + 22,956 cache write (1h) + 270,983 cache read = 293,951 in; 3,379 out.
+  = $0.0000 + $0.1836 + $0.0542 + $0.0676 = $0.3055.
+- Permission prompts: none reported.
+
+**Pass/Fail:** Pass
+
+**Comparison with Run 003 (same prompt content; old report removed):**
+
+| Metric | Run 003 | Run 004 | Change |
+|--------|---------|---------|--------|
+| Rubric | 16/16 | 16/16 | none |
+| Read the old report? | yes | no (none there) | the change |
+| Report lines changed vs last commit | (overwrote Run 002's) | 36 insertions, 29 deletions | fresh report |
+| Agent work time | ~49s | ~37s | -24% |
+| Tool calls | 4 | 5 | +1 |
+| Tokens in | 237,853 | 293,951 | +24% |
+| Cost | $0.27 | $0.31 | +15% |
+| Review latency | 8m10.98s | 2m19.00s | -72% (review sheet) |
+
+**Observations:** One change from Run 003: the old report was deleted before the run. The agent wrote a fresh report
+(`git diff --stat`: 36 insertions, 29 deletions) and still scored 16/16, so deleting it didn't hurt quality. True
+parallel run with Task 2 Run 002. The prompt was pasted inside an already-open Claude session, so there is no `time`
+output; working time from the transcript. The review sheet cut review time to 2:19. Also noted: the report's
+unscored skipped-tests section says napalm "is not installed", while Run 003's evidence showed the import failing
+because `pkg_resources` is missing. Out-of-scope content isn't checked by the rubric, so small errors there can go
+unnoticed. Four runs of v2 now all score 16/16 with costs of $0.27-$0.36.
 
 ### Run 003 -- 2026-11-24 -- Repeat of Run 002, run in parallel with Task 2 (Module 1 Lab)
 
